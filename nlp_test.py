@@ -195,6 +195,16 @@ if __name__ == '__main__':
     #setting up the model
     
     #training the model
+    #first we set the turn timeout
+    num_turns = 50
+    
+    while num_turns > 0 :
+        #do the stuff
+        
+        
+        
+        
+        num_turns += -1
     
         
     
