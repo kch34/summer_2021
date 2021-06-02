@@ -260,12 +260,172 @@ if __name__ == '__main__':
                 print("I need blocks")
                 if(agent_can_take_blocks == True):#agent has room to take blocks
                     print("I have room to take blocks")
+                    #check the middle for blocks
+                    if middle == [0,0,0]:
+                        #no blocks present so we ask for one
+                        #find a block that the other agent has of ours and ask them to move it
+                        for b in agent2_owned:
+                            if (b in agent_needed):
+                                if(c_grid[0][1] == 0):
+                                    i = 0
+                                    j = 1
+                                elif(c_grid[1][1] == 0):
+                                    i = 1
+                                    j = 1
+                                else:
+                                    i = 2
+                                    j = 1
+                                output_msg = "move " + b + " " + str(i) + " " + str(j)
+                                return output_msg
+                    else:
+                        #the middle has blocks, but are they mine?
+                        for b in middle:
+                            if b in agent_needed:
+                                if side == "left": #set for the left agent
+                                    j = 0
+                                else:#set for the right agent
+                                    j = 2
+                                #move the block
+                                if(c_grid[0][j] == 0):
+                                    i = 0
+                                elif(c_grid[1][j] == 0):
+                                    i = 1
+                                else:
+                                    i = 2
+                                #moving
+                                try:
+                                    for ii in range(3):
+                                        for jj in range(3):
+                                            if c_grid[ii][jj] == b:
+                                               c_grid[ii][jj] = 0
+                                               c_grid[i][j] = b
+                                               raise Found
+                                except Found:
+                                    #do nothing
+                                    n=5          
+                                agent_owned.append(b)
+                                agent.set_colors_owned(agent_owned)
+                                output_msg = "moved " + b + " " + str(i) + " " + str(j)
+                                return output_msg
+                        #if we make it this far then the middle blocks aren't mine
+                        #find a block that the other agent has of ours and ask them to move it
+                        for b in agent2_owned:
+                            if (b in agent_needed):
+                                if(c_grid[0][1] == 0):
+                                    i = 0
+                                    j = 1
+                                elif(c_grid[1][1] == 0):
+                                    i = 1
+                                    j = 1
+                                else:
+                                    i = 2
+                                    j = 1
+                                output_msg = "move " + b + " " + str(i) + " " + str(j)
+                                return output_msg                    
                 else:#agent does not have room to take blocks
                     print("I do not have room to take blocks")
+                    #check if agent owns blocks the other agent needs
+                    for b in agent_owned:
+                            if (b in agent2_needed):
+                                if(c_grid[0][1] == 0):
+                                    i = 0
+                                    j = 1
+                                elif(c_grid[1][1] == 0):
+                                    i = 1
+                                    j = 1
+                                else:
+                                    i = 2
+                                    j = 1
+                                #moving
+                                try:
+                                    for ii in range(3):
+                                        for jj in range(3):
+                                            if c_grid[ii][jj] == b:
+                                               c_grid[ii][jj] = 0
+                                               c_grid[i][j] = b
+                                               raise Found
+                                except Found:
+                                    #do nothing
+                                    n=5   
+                                agent_owned.remove(b)
+                                agent.set_colors_owned(agent_owned)
+                                output_msg = "moved " + b + " " + str(i) + " " + str(j)
+                                return output_msg   
+                    #Agent doesnt own needed blocks
+                    #check for not needed blocks to move
+                    for b in agent_owned:
+                        if (b in agent_needed) == False:
+                                if(c_grid[0][1] == 0):
+                                    i = 0
+                                    j = 1
+                                elif(c_grid[1][1] == 0):
+                                    i = 1
+                                    j = 1
+                                else:
+                                    i = 2
+                                    j = 1
+                                #moving
+                                try:
+                                    for ii in range(3):
+                                        for jj in range(3):
+                                            if c_grid[ii][jj] == b:
+                                               c_grid[ii][jj] = 0
+                                               c_grid[i][j] = b
+                                               raise Found
+                                except Found:
+                                    #do nothing
+                                    n=5   
+                                agent_owned.remove(b)
+                                agent.set_colors_owned(agent_owned)
+                                output_msg = "moved " + b + " " + str(i) + " " + str(j)
+                                return output_msg   
+                                                        
         else:#agent is not in need of blocks
                 print("I do not need blocks")
                 if(agent_can_take_blocks == True):#agent has room to take blocks
                     print("I have room to take blocks")
+                    #see if there is an orphan block
+                    if(c_grid[0][1] != 0):
+                        orphan = c_grid[0][1]
+                    elif(c_grid[1][1] != 0):
+                        orphan = c_grid[1][1]
+                    elif(c_grid[2][1] != 0):
+                        orphan = c_grid[2][1]    
+                    else:
+                        output_msg = "I'm out of moves."
+                        return output_msg
+                    #check if the orphan is in agent 2's needed
+                    if (orphan in agent2_needed):
+                        output_msg = "I'm out of moves."
+                        return output_msg
+                    b = orphan
+                    #if it is not in the needed then take it as an orphan
+                    if side == "left": #set for the left agent
+                        j = 0
+                    else:#set for the right agent
+                        j = 2
+                    #move the block
+                    if(c_grid[0][j] == 0):
+                        i = 0
+                    elif(c_grid[1][j] == 0):
+                        i = 1
+                    else:
+                        i = 2
+                    #moving
+                    try:
+                        for ii in range(3):
+                            for jj in range(3):
+                                if c_grid[ii][jj] == b:
+                                    c_grid[ii][jj] = 0
+                                    c_grid[i][j] = b
+                                    raise Found
+                    except Found:
+                        #do nothing
+                        n=5          
+                    agent_owned.append(b)
+                    agent.set_colors_owned(agent_owned)
+                    output_msg = "moved " + b + " " + str(i) + " " + str(j)
+                    return output_msg                                                                                
                 else:#agent does not have room to take blocks
                     print("I do not have room to take blocks")
         
@@ -285,7 +445,7 @@ if __name__ == '__main__':
     
     #training the model
     #first we set the turn timeout
-    num_turns = 3
+    num_turns = 50
     game_log = []
     txt = "Game Start"
     print(txt)
@@ -309,7 +469,19 @@ if __name__ == '__main__':
         game_log.append(txt)
         #do the stuff
         num_turns-=1
+        middle = [c_grid[0][1],c_grid[1][1],c_grid[2][1]]
         print_current()
+        
+        #sainity check for winning
+        if(c_grid[0][0] in robot1.get_colors_needed() and 
+           c_grid[1][0] in robot1.get_colors_needed() and 
+           c_grid[2][0] in robot1.get_colors_needed()):
+            if(c_grid[0][2] in robot2.get_colors_needed() and
+               c_grid[1][2] in robot2.get_colors_needed() and 
+               c_grid[2][2] in robot2.get_colors_needed()):
+                break
+                print("Goal state reached")
+        
         print(" ")
 
     
