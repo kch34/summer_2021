@@ -63,11 +63,20 @@ if __name__ == '__main__':
         print(g_grid[2])
         
     class botty:
-      def __init__(self, name, blocks, colors_needed):
-        self.name = name
-        self.blocks = blocks
-        self.colors_owned = blocks
-        self.colors_needed = colors_needed
+        def __init__(self, name, blocks, colors_needed):
+            self.name = name
+            self.blocks = blocks
+            self.colors_owned = blocks
+            self.colors_needed = colors_needed
+        def get_colors_owned(self):
+            return self.colors_owned
+        def get_colors_needed(self):
+            return self.colors_needed
+        def set_colors_owned(self,x):
+            self.colors_owned = x
+        def set_colors_needed(self,x):
+            self.colors_needed = x
+            
     
     
     
@@ -189,24 +198,162 @@ if __name__ == '__main__':
                 g_grid[i][2] = orphan.pop()
             if (not orphan) ==True:
                 break    
+    
     print_current()
     print_goal()
+    
+    robot1.set_colors_owned(list(robot1.get_colors_owned().values()))
+    robot2.set_colors_owned(list(robot2.get_colors_owned().values()))
+    
+    robot1.set_colors_needed(list(robot1.get_colors_needed().values()))
+    robot2.set_colors_needed(list(robot2.get_colors_needed().values()))
+    
+    #setting up a general heuristic for learning
+    def h_general(agent,agent2,input_msg,side):
+        
+        
+        agent_owned = agent.get_colors_owned()
+        agent_needed = agent.get_colors_needed()
+        
+        agent2_owned = agent2.get_colors_owned()
+        agent2_needed = agent2.get_colors_needed()
+        
+        agent_needs_blocks = False
+        agent_can_take_blocks = False
+        agent_has_needed_blocks = False
+        
+        #Does the agent need a block?
+        for b in agent_needed:
+            if (b in agent_owned) == False:
+                agent_needs_blocks = True
+        
+        #can the agent take blocks?
+        if len(agent_owned) < 3:
+            agent_can_take_blocks = True
+
+        """
+        #Does the agent have needed blocks?
+        for b in agent_owned:
+            if (b in agent2_needed):
+                agent_has_needed_blocks = True
+                """  
+        
+        if(input_msg != "Game Start"):
+            msg_list = input_msg.split()
+            action = msg_list[0]
+            if action == "move":
+                #this indicates the agent was asked to move something, else
+                #it would just be a statment moved.
+                color = msg_list[1]
+                i = int(msg_list[2])
+                j = int(msg_list[3])
+                #now that we have the desired block data, we find it and move it
+                #Does the agent have needed blocks?
+                for ii in range(3):
+                    for jj in range(3):
+                        if c_grid[ii][jj] == color:
+                           c_grid[ii][jj] = 0
+                           c_grid[i][j] = color
+                           break
+                agent.set_colors_owned(agent_owned.remove(color))
+                output_msg = "moved " + color + " " + str(i) + " " + str(j)
+                return output_msg
+        
+        
+        #the agent is in need of blocks 
+        if(agent_needs_blocks == True):
+            print("I need")
+            #the agent can take blocks
+            if(agent_can_take_blocks == True):
+                print("I can take")
+                #check if there are any blocks to take, if not then ask for one
+                if(c_grid[0][1] == 0 and c_grid[1][1] == 0 and c_grid[2][1] == 0):
+                    #find a block that the other agent has of ours and ask them to move it
+                    for b in agent2_owned:
+                        if (b in agent_needed):
+                            if(c_grid[0][1] == 0):
+                                i = 0
+                                j = 1
+                            elif(c_grid[1][1] == 0):
+                                i = 1
+                                j = 1
+                            else:
+                                i = 2
+                                j = 1
+                            output_msg = "move " + b + " " + str(i) + " " + str(j)
+                            return output_msg
+                else:
+                    #there exists a block to take, we have to check if it is one we need
+                    if(c_grid[0][1] in agent_needed):
+                        i = 0
+                        j = 1
+                    elif(c_grid[1][1] in agent_needed):
+                        i = 1
+                        j = 1
+                    elif(c_grid[2][1] in agent_needed):
+                        i = 2
+                        j = 1
+                        
+            else:
+                print("I can't take")
+                #find a block that the other agent has of ours and ask them to move it
+                for b in agent2_owned:
+                    if (b in agent_needed):
+                        if(c_grid[0][1] == 0):
+                            i = 0
+                            j = 1
+                        elif(c_grid[1][1] == 0):
+                            i = 1
+                            j = 1
+                        else:
+                            i = 2
+                            j = 1
+                        output_msg = "move " + b + " " + str(i) + " " + str(j)
+                        return output_msg
+        else:
+            print("I don't need")
+
+        
+        #Does the agent have orphaned blocks?
+        
+        
+        
+    
+    
+    
+    
+    print("  ")
     
     #setting up the model
     
     #training the model
     #first we set the turn timeout
-    num_turns = 50
+    num_turns = 2
+    game_log = []
+    txt = "Game Start"
+    print(txt)
+    print("  ")
+    game_log.append(txt)
+    A = True
     
     while num_turns > 0 :
+
+        if A==True:
+            print(robot1.name)
+            txt = h_general(robot1,robot2,game_log[-1],"left")
+            A = False
+        else:
+            print(robot2.name)
+            txt = h_general(robot2,robot1,game_log[-1],"right")            
+            A = True
+        print(txt)
+        game_log.append(txt)
         #do the stuff
-        
-        
-        
-        
-        num_turns += -1
+        num_turns-=1
+        print_current()
+        print(" ")
+
     
-        
     
     
     
