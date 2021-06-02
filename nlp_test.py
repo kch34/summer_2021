@@ -77,7 +77,7 @@ if __name__ == '__main__':
         def set_colors_needed(self,x):
             self.colors_needed = x
             
-    
+    class Found(Exception): pass
     
     
     #data encodings
@@ -210,34 +210,24 @@ if __name__ == '__main__':
     
     #setting up a general heuristic for learning
     def h_general(agent,agent2,input_msg,side):
-        
-        
+        #get agent1's features
         agent_owned = agent.get_colors_owned()
         agent_needed = agent.get_colors_needed()
-        
+        #get agent2's features
         agent2_owned = agent2.get_colors_owned()
         agent2_needed = agent2.get_colors_needed()
-        
+        #flags for heuristic logic
         agent_needs_blocks = False
         agent_can_take_blocks = False
-        agent_has_needed_blocks = False
-        
         #Does the agent need a block?
         for b in agent_needed:
             if (b in agent_owned) == False:
                 agent_needs_blocks = True
-        
         #can the agent take blocks?
         if len(agent_owned) < 3:
             agent_can_take_blocks = True
 
-        """
-        #Does the agent have needed blocks?
-        for b in agent_owned:
-            if (b in agent2_needed):
-                agent_has_needed_blocks = True
-                """  
-        
+        #we look to see if the other agent asked us to move a block        
         if(input_msg != "Game Start"):
             msg_list = input_msg.split()
             action = msg_list[0]
@@ -249,71 +239,38 @@ if __name__ == '__main__':
                 j = int(msg_list[3])
                 #now that we have the desired block data, we find it and move it
                 #Does the agent have needed blocks?
-                for ii in range(3):
-                    for jj in range(3):
-                        if c_grid[ii][jj] == color:
-                           c_grid[ii][jj] = 0
-                           c_grid[i][j] = color
-                           break
-                agent.set_colors_owned(agent_owned.remove(color))
+                try:
+                    for ii in range(3):
+                        for jj in range(3):
+                            if c_grid[ii][jj] == color:
+                               c_grid[ii][jj] = 0
+                               c_grid[i][j] = color
+                               raise Found
+                except Found:
+                    #do nothing
+                    n=5                      
+                agent_owned.remove(color)
+                agent.set_colors_owned(agent_owned)
                 output_msg = "moved " + color + " " + str(i) + " " + str(j)
                 return output_msg
         
         
-        #the agent is in need of blocks 
-        if(agent_needs_blocks == True):
-            print("I need")
-            #the agent can take blocks
-            if(agent_can_take_blocks == True):
-                print("I can take")
-                #check if there are any blocks to take, if not then ask for one
-                if(c_grid[0][1] == 0 and c_grid[1][1] == 0 and c_grid[2][1] == 0):
-                    #find a block that the other agent has of ours and ask them to move it
-                    for b in agent2_owned:
-                        if (b in agent_needed):
-                            if(c_grid[0][1] == 0):
-                                i = 0
-                                j = 1
-                            elif(c_grid[1][1] == 0):
-                                i = 1
-                                j = 1
-                            else:
-                                i = 2
-                                j = 1
-                            output_msg = "move " + b + " " + str(i) + " " + str(j)
-                            return output_msg
-                else:
-                    #there exists a block to take, we have to check if it is one we need
-                    if(c_grid[0][1] in agent_needed):
-                        i = 0
-                        j = 1
-                    elif(c_grid[1][1] in agent_needed):
-                        i = 1
-                        j = 1
-                    elif(c_grid[2][1] in agent_needed):
-                        i = 2
-                        j = 1
-                        
-            else:
-                print("I can't take")
-                #find a block that the other agent has of ours and ask them to move it
-                for b in agent2_owned:
-                    if (b in agent_needed):
-                        if(c_grid[0][1] == 0):
-                            i = 0
-                            j = 1
-                        elif(c_grid[1][1] == 0):
-                            i = 1
-                            j = 1
-                        else:
-                            i = 2
-                            j = 1
-                        output_msg = "move " + b + " " + str(i) + " " + str(j)
-                        return output_msg
-        else:
-            print("I don't need")
-
         
+        if(agent_needs_blocks == True):#the agent is in need of blocks 
+                print("I need blocks")
+                if(agent_can_take_blocks == True):#agent has room to take blocks
+                    print("I have room to take blocks")
+                else:#agent does not have room to take blocks
+                    print("I do not have room to take blocks")
+        else:#agent is not in need of blocks
+                print("I do not need blocks")
+                if(agent_can_take_blocks == True):#agent has room to take blocks
+                    print("I have room to take blocks")
+                else:#agent does not have room to take blocks
+                    print("I do not have room to take blocks")
+        
+        
+    
         #Does the agent have orphaned blocks?
         
         
@@ -328,13 +285,15 @@ if __name__ == '__main__':
     
     #training the model
     #first we set the turn timeout
-    num_turns = 2
+    num_turns = 3
     game_log = []
     txt = "Game Start"
     print(txt)
     print("  ")
     game_log.append(txt)
     A = True
+    
+    middle = [c_grid[0][1],c_grid[1][1],c_grid[2][1]]
     
     while num_turns > 0 :
 
