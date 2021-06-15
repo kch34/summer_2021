@@ -8,45 +8,6 @@ import torch.nn as nn
 import random
 import statistics
 import matplotlib.pyplot as plt
-#current plan
-"""
-World:
-1. I have a random set of between 1-3 blocks
-2. You have a random set of between 1-3 blocks
-3. I need a random set of 1-3 colors
-4. You need a random set of 1-3 colors
-"""
-"""
-Input:
-1. Grid of the current world state
-2. Goal configuration
-3. Message (or null message) from other agent
-
-Output: 
-1. Color + "send" or "location"
-
-Logic:
-while True:
-   if turn A:
-      optimal action for A
-  else
-      optimal action for B
-
-Simple initial model:
-Inputs are linearized representations of the three inputs above which are then embedded.  These are passed to two fully-connected layers and then outs are.
-1. fully connected layer over the space of colors (with a softmax)
-2. fully connected layer over the space of locations and the send command.
-This means the model makes two choices: What color and what to do with it.
-
-Simple initial training paradigm:
-By rolling out a bunch of the logic (above) we can produce input-output pairs of the form:  Given that I'm in the following situation (current state, message) I should predict the following color+loc/send.  This is trained via supervised training.
-
-Simple evaluation setting:
-Given two agents which have converged to near perfect performance on the training setup above, run them on random world configurations and see how many turns it takes for them to complete the task on average with a max-timeout of N turns (set N large but not too large, e.g. 50).
-
-Once all of this is in place, we can now ask questions about smarter training and/or modeling decisions.
-"""
-
 
 def pro():
 
@@ -509,7 +470,7 @@ def pro():
     
 totalblocks = []
 totalturns = []
-for i in range(5000):
+for i in range(1):
     tb, tt = pro()
     totalblocks.append(tb)
     totalturns.append(tt)
