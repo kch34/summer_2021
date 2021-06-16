@@ -194,8 +194,7 @@ def pro():
                     agent_needs_blocks = True
             #can the agent take blocks?
             if len(agent_owned) < 3:
-                agent_can_take_blocks = True
-    
+                agent_can_take_blocks = True    
             #we look to see if the other agent asked us to move a block        
             if(input_msg != "Game Start"):
                 msg_list = input_msg.split()
@@ -222,10 +221,7 @@ def pro():
                     agent.set_colors_owned(agent_owned)
                     output_msg = "moved " + color + " " + str(i) + " " + str(j)
                     agent.set_done(False)
-                    return output_msg
-            
-            
-            
+                    return output_msg                                    
             if(agent_needs_blocks == True):#the agent is in need of blocks 
                     print("I need blocks")
                     if(agent_can_take_blocks == True):#agent has room to take blocks
@@ -353,8 +349,7 @@ def pro():
                                     agent.set_colors_owned(agent_owned)
                                     output_msg = "moved " + b + " " + str(i) + " " + str(j)
                                     agent.set_done(False)
-                                    return output_msg   
-                                                            
+                                    return output_msg                                                               
             else:#agent is not in need of blocks
                     print("I do not need blocks")
                     if(agent_can_take_blocks == True):#agent has room to take blocks
@@ -409,16 +404,6 @@ def pro():
                         output_msg = "I'm out of moves."
                         agent.set_done(True)
                         return output_msg
-            
-        
-            #Does the agent have orphaned blocks?
-            
-            
-            
-        
-        
-        
-        
         print("  ")
         
         #setting up the model
