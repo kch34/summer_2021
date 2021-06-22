@@ -8,6 +8,59 @@ import torch.nn as nn
 import random
 import statistics
 import matplotlib.pyplot as plt
+import numpy as np
+
+
+
+BOARD_ROWS = 3
+BOARD_COLS = 3
+
+class State:
+    #initialize the state 
+    def __init__(self, p1, p2, board):
+        self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.boardHash = None
+
+    # board reset
+    def reset(self):
+        self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.boardHash = None
+    
+    #update the state
+    def updateState(self, position,value):
+        self.board[position] = value
+
+
+
+
+colors = {1:"black",2:"blue",3:"white",4:"red",5:"yellow",6:"pink"}
+
+
+
+def print_current():
+    print("Current state")
+    print(c_grid[0])
+    print(c_grid[1])
+    print(c_grid[2])
+
+
+def print_goal():
+    print("Goal State")
+    print(g_grid[0])
+    print(g_grid[1])
+    print(g_grid[2])
+
+
+
+
+
+
+
+
+
+
 
 def pro():
 
@@ -15,19 +68,6 @@ def pro():
     if __name__ == '__main__':
         freeze_support()
         
-        
-        def print_current():
-            print("Current state")
-            print(c_grid[0])
-            print(c_grid[1])
-            print(c_grid[2])
-            
-        def print_goal():
-            print("Goal State")
-            print(g_grid[0])
-            print(g_grid[1])
-            print(g_grid[2])
-            
         class botty:
             def __init__(self, name, blocks, colors_needed):
                 self.name = name
