@@ -15,48 +15,63 @@ import numpy as np
 BOARD_ROWS = 3
 BOARD_COLS = 3
 
+colors = {1:"black",2:"blue",3:"white",4:"red",5:"yellow",6:"pink"}
+
+#the board class
 class State:
     #initialize the state 
-    def __init__(self, p1, p2, board):
+    def __init__(self):
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.boardHash = None
-
     # board reset
     def reset(self):
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.boardHash = None
-    
     #update the state
     def updateState(self, position,value):
         self.board[position] = value
+    #print the current board state
+    def print_current(self):
+        print("Current state")
+        print(self.board[0])
+        print(self.board[1])
+        print(self.board[2])
+    #print the goal board state
+    def print_goal(self):
+        print("Goal State")
+        print(self.goal_board[0])
+        print(self.goal_board[1])
+        print(self.goal_board[2])
+        
+#agent class
+class botty:
+    #initialize the robot with name blocks owned and needed
+    def __init__(self, name, blocks, colors_needed):
+        self.name = name
+        self.blocks = blocks
+        self.colors_owned = blocks
+        self.colors_needed = colors_needed
+        self.done = False
+    #return the colors owned
+    def get_colors_owned(self):
+        return self.colors_owned
+    #return the colors needed
+    def get_colors_needed(self):
+        return self.colors_needed
+    #set the colors owned
+    def set_colors_owned(self,x):
+        self.colors_owned = x
+    #set the colors needed
+    def set_colors_needed(self,x):
+        self.colors_needed = x
+    #set that the agent is done and ready to quit
+    def set_done(self,x):
+        self.done = x
 
-
-
-
-colors = {1:"black",2:"blue",3:"white",4:"red",5:"yellow",6:"pink"}
-
-
-
-def print_current():
-    print("Current state")
-    print(c_grid[0])
-    print(c_grid[1])
-    print(c_grid[2])
-
-
-def print_goal():
-    print("Goal State")
-    print(g_grid[0])
-    print(g_grid[1])
-    print(g_grid[2])
-
-
-
-
-
-
+#blank exception class used for breaking double loops
+class Found(Exception): pass
 
 
 
@@ -68,25 +83,9 @@ def pro():
     if __name__ == '__main__':
         freeze_support()
         
-        class botty:
-            def __init__(self, name, blocks, colors_needed):
-                self.name = name
-                self.blocks = blocks
-                self.colors_owned = blocks
-                self.colors_needed = colors_needed
-                self.done = False
-            def get_colors_owned(self):
-                return self.colors_owned
-            def get_colors_needed(self):
-                return self.colors_needed
-            def set_colors_owned(self,x):
-                self.colors_owned = x
-            def set_colors_needed(self,x):
-                self.colors_needed = x
-            def set_done(self,x):
-                self.done = x
+        
                 
-        class Found(Exception): pass
+
         
         
         #data encodings

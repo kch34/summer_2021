@@ -77,10 +77,7 @@ class State:
                     positions.append((i, j))  # need to be tuple
         return positions
 
-    def updateState(self, position):
-        self.board[position] = self.playerSymbol
-        # switch to another player
-        self.playerSymbol = -1 if self.playerSymbol == 1 else 1
+    
 
     # only when game ends
     def giveReward(self):
