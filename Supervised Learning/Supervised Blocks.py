@@ -2,21 +2,22 @@
 """
 @author: Hostl
 """
-from multiprocessing import Process, freeze_support
-import sys, torch, copy, time, os, torchvision, gc
-import torch.nn as nn
+#imports
+from multiprocessing import freeze_support  #needed due to windows processing
+#import sys, torch, copy, time, os, torchvision, gc   
+#import torch.nn as nn
 import random
-import statistics
+#import statistics
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-
+#set the size of the board
 BOARD_ROWS = 3
 BOARD_COLS = 3
-
+#set the color dictionary
 colors = {1:"black",2:"blue",3:"white",4:"red",5:"yellow",6:"pink"}
-
+key_list = list(colors.keys())
+val_list = list(colors.values())
 #the board class
 class State:
     #initialize the state 
@@ -81,75 +82,66 @@ def pro():
 
     #need this for multithreading
     if __name__ == '__main__':
+        #used for multithreading
         freeze_support()
         
-        
-                
+        #the main board to be manipulated
+        board = State()
 
-        
-        
-        #data encodings
-        color_ix = {"Black":0,"Blue":1,"White":2,
-                    "Red":3,"Yellow":4,"Pink":5}
-        location_ix = {"one":6,   "two":7,   "three":8,
-                       "four":9,  "five":10, "six":11,
-                       "seven":12,"eight":13,"nine":14}
-        
-        
-        
-        
-        #for i in range(100):
-        
-        d1_grid = [[0,0,0],
-                   [0,0,0],
-                   [0,0,0]]
-        c_grid  = [[0,0,0],
-                   [0,0,0],
-                   [0,0,0]]
-        g_grid  = [[0,0,0],
-                   [0,0,0],
-                   [0,0,0]]
-        d1_colors = ['Black','Blue','White','Red','Yellow','Pink']
-            
+        #we set the current color set to be used
+        color_set = list(colors.values())
+        #We make sure we shuffle the list each time
+        random.shuffle(color_set)
+
+        #set the amount of starting colors for both agents
         start_color1 = random.randint(1, 3)
-        start_block1 = {}
-        for i in range(start_color1):
-            random.shuffle(d1_colors)
-            start_block1[i] = d1_colors.pop()
-        
         start_color2 = random.randint(1, 3)
-        start_block2 = {}
-        for i in range(start_color2):
-            random.shuffle(d1_colors)
-            start_block2[i] = d1_colors.pop()
         
-        d1_colors = [1,2,3,4,5,6]
+        #set the starting colors
+        start_block1 = []
+        start_block2 = []
         
+        #set the starting colors for the first agent
+        for i in range(start_color1):            
+            start_block1.append(color_set.pop(0))
+        start_block1.sort()
+        
+        #set the starting colors for the second agent
+        for i in range(start_color2):            
+            start_block2.append(color_set.pop(0))
+        start_block2.sort()
+
+        #set the amount of colors needed for both agents
         color1 = random.randint(1, len(start_block2))
-        color_needed1 = {}
         color2 = random.randint(1, len(start_block1))
-        color_needed2 = {}
-    
-        temp = list(start_block2.values())
+        
+        #set what the colors needed are for the first agent
+        color_needed1 = []        
+        temp = start_block2.copy()
         random.shuffle(temp)
         for i in range(color1):
-            color_needed1[i] = temp.pop()
-        temp = list(start_block1.values())
+            color_needed1.append(temp.pop(0))
+
+        #set what the colors needed are for the second agent
+        color_needed2 = []        
+        temp = start_block1.copy()
         random.shuffle(temp)
         for i in range(color2):
-            color_needed2[i] = temp.pop()
-        
+            color_needed2.append(temp.pop(0))
+
+        #initialize both agents
         robot1 = botty('taysir',start_block1,color_needed1)
         robot2 = botty('zach',start_block2,color_needed2)
-       
-        for i in range(len(robot1.blocks)):
-            c_grid[i][0] = robot1.blocks[i]
-        for i in range(len(robot2.blocks)):
-            c_grid[i][2] = robot2.blocks[i]
-    
         
-        needed1 = list(robot1.colors_needed.values())
-        needed2 = list(robot2.colors_needed.values())
+        #set the blocks on the board for each agent
+        for i in range(len(robot1.blocks)):              
+            board.updateState((i,0), key_list[val_list.index(robot1.blocks[i])])
+        for i in range(len(robot2.blocks)):
+            board.updateState((i,2), key_list[val_list.index(robot2.blocks[i])])
+    
+        #set temp needed values for the goal state
+        needed1 = robot1.colors_needed.copy()
+        needed2 = robot2.colors_needed.copy()
         
         for i in range(3):
             for j in range(3):
