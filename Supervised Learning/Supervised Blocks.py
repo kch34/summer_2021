@@ -10,6 +10,7 @@ import random
 #import statistics
 import matplotlib.pyplot as plt
 import numpy as np
+import copy
 
 #set the size of the board
 BOARD_ROWS = 3
@@ -44,8 +45,7 @@ class State:
         print("Goal State")
         print(self.goal_board[0])
         print(self.goal_board[1])
-        print(self.goal_board[2])
-        
+        print(self.goal_board[2])        
 #agent class
 class botty:
     #initialize the robot with name blocks owned and needed
@@ -70,88 +70,85 @@ class botty:
     #set that the agent is done and ready to quit
     def set_done(self,x):
         self.done = x
-
 #blank exception class used for breaking double loops
 class Found(Exception): pass
-
-
-
-
-
+#the main code to be used for looping
 def pro():
-
     #need this for multithreading
     if __name__ == '__main__':
         #used for multithreading
-        freeze_support()
-        
+        freeze_support()        
         #the main board to be manipulated
         board = State()
-
         #we set the current color set to be used
         color_set = list(colors.values())
         #We make sure we shuffle the list each time
         random.shuffle(color_set)
-
         #set the amount of starting colors for both agents
         start_color1 = random.randint(1, 3)
         start_color2 = random.randint(1, 3)
-        
         #set the starting colors
         start_block1 = []
         start_block2 = []
-        
         #set the starting colors for the first agent
         for i in range(start_color1):            
             start_block1.append(color_set.pop(0))
         start_block1.sort()
-        
         #set the starting colors for the second agent
         for i in range(start_color2):            
             start_block2.append(color_set.pop(0))
         start_block2.sort()
-
         #set the amount of colors needed for both agents
         color1 = random.randint(1, len(start_block2))
         color2 = random.randint(1, len(start_block1))
-        
         #set what the colors needed are for the first agent
         color_needed1 = []        
         temp = start_block2.copy()
         random.shuffle(temp)
         for i in range(color1):
             color_needed1.append(temp.pop(0))
-
         #set what the colors needed are for the second agent
         color_needed2 = []        
         temp = start_block1.copy()
         random.shuffle(temp)
         for i in range(color2):
             color_needed2.append(temp.pop(0))
-
         #initialize both agents
         robot1 = botty('taysir',start_block1,color_needed1)
         robot2 = botty('zach',start_block2,color_needed2)
-        
         #set the blocks on the board for each agent
         for i in range(len(robot1.blocks)):              
             board.updateState((i,0), key_list[val_list.index(robot1.blocks[i])])
         for i in range(len(robot2.blocks)):
             board.updateState((i,2), key_list[val_list.index(robot2.blocks[i])])
-    
-        #set temp needed values for the goal state
+            
+        #set temp needed values for the goal state                    
         needed1 = robot1.colors_needed.copy()
+        owned1  = robot1.colors_owned.copy()
         needed2 = robot2.colors_needed.copy()
-        
-        for i in range(3):
-            for j in range(3):
-                g_grid[i][j] = c_grid[i][j]
-        
+        owned2  = robot2.colors_owned.copy()        
+        #make a copy of the board state for the goal.
+        board.goal_board = copy.deepcopy(board.board)
+        #orphan list
+        orphans = []
         #go through the left side first   
         #take out the ones that robot2 needs
         for i in range(3):
-            if g_grid[i][0] in needed2:
-                g_grid[i][0] = 0;
+            if val_list[int(board.goal_board[i][0]-1)] in needed2:
+                board.goal_board[i][0] = 0.0                
+        #add in the ones that robot1 needs
+        for i in range(3):
+            if board.goal_board[i][0] == 0.0 in needed1:
+                board.goal_board[i][0] = key_list[val_list.index(needed1.pop())]
+        #oprhan check
+        if (not needed1) == False: 
+            while (not needed1) == False:
+                #add in the ones that robot1 needs
+                for i in range(3):
+                    if board.goal_board[i][0] == 0.0 in needed1:
+                        board.goal_board[i][0] = key_list[val_list.index(needed1.pop())]
+                
+                
         #add in what robot1 needs to it's side
         for i in range(3):
             if g_grid[i][0]==0 and (not needed1) == False:
