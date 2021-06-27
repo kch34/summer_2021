@@ -11,7 +11,6 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
-
 #set the size of the board
 BOARD_ROWS = 3
 BOARD_COLS = 3
@@ -120,13 +119,12 @@ def pro():
         for i in range(len(robot1.blocks)):              
             board.updateState((i,0), key_list[val_list.index(robot1.blocks[i])])
         for i in range(len(robot2.blocks)):
-            board.updateState((i,2), key_list[val_list.index(robot2.blocks[i])])
-            
+            board.updateState((i,2), key_list[val_list.index(robot2.blocks[i])])            
         #set temp needed values for the goal state                    
         needed1 = robot1.colors_needed.copy()
-        owned1  = robot1.colors_owned.copy()
+        needed1_1 = robot1.colors_needed.copy()
         needed2 = robot2.colors_needed.copy()
-        owned2  = robot2.colors_owned.copy()        
+        needed2_2 = robot2.colors_needed.copy()
         #make a copy of the board state for the goal.
         board.goal_board = copy.deepcopy(board.board)
         #orphan list
@@ -134,76 +132,73 @@ def pro():
         #go through the left side first   
         #take out the ones that robot2 needs
         for i in range(3):
-            if val_list[int(board.goal_board[i][0]-1)] in needed2:
+            if val_list[int(board.goal_board[i][0]-1)] in needed2_2:
                 board.goal_board[i][0] = 0.0                
         #add in the ones that robot1 needs
         for i in range(3):
-            if board.goal_board[i][0] == 0.0 in needed1:
+            if board.goal_board[i][0] == 0.0 and (not needed1)==False:
                 board.goal_board[i][0] = key_list[val_list.index(needed1.pop())]
         #oprhan check
         if (not needed1) == False: 
             while (not needed1) == False:
+                #check for needed orphans
+                for i in range(3):
+                    if val_list[int(board.goal_board[i][0]-1)] in needed1_1 == False:
+                        orphans.append(board.goal_board[i][0])
+                        board.goal_board[i][0] = 0.0
+                        break                                
                 #add in the ones that robot1 needs
                 for i in range(3):
-                    if board.goal_board[i][0] == 0.0 in needed1:
+                    if board.goal_board[i][0] == 0.0:
                         board.goal_board[i][0] = key_list[val_list.index(needed1.pop())]
-                
-                
-        #add in what robot1 needs to it's side
-        for i in range(3):
-            if g_grid[i][0]==0 and (not needed1) == False:
-                g_grid[i][0] = needed1.pop()
-        #this is if robot1 needs to move a block thats extra
-        temp = list(robot1.colors_needed.values())
-        orphan = []
-        if (not needed1) == False:
-            for i in range(3):
-                if (g_grid[i][0] in temp) == False and (g_grid[i][0] in needed2) == False:
-                    orphan.append(g_grid[i][0])
-                    g_grid[i][0] = needed1.pop()
-                if (not needed1) == True:
-                    break    
-        needed1 = list(robot1.colors_needed.values())
-        #go through the right side now   
+                        break                                
+        #Go through the right side now
         #take out the ones that robot1 needs
         for i in range(3):
-            if g_grid[i][2] in needed1:
-                g_grid[i][2] = 0;
-        #add in what robot2 needs to it's side
+            if val_list[int(board.goal_board[i][2]-1)] in needed1_1:
+                board.goal_board[i][2] = 0.0    
+        #add in the ones that robot2 needs
         for i in range(3):
-            if g_grid[i][2]==0 and (not needed2) == False:
-                g_grid[i][2] = needed2.pop()
-        #this is if robot1 needs to move a block thats extra
-        temp = list(robot2.colors_needed.values())
-        if (not needed2) == False:
+            if board.goal_board[i][2] == 0.0 and (not needed2)==False:
+                board.goal_board[i][2] = key_list[val_list.index(needed2.pop())]      
+        #check if oprhans is empty or not 
+        if (not orphans)==False:
+            #add in the orphans
             for i in range(3):
-                if (g_grid[i][2] in temp) == False and (g_grid[i][2] in needed1) == False:
-                    orphan.append(g_grid[i][2])
-                    g_grid[i][2] = needed2.pop()
-                if (not needed2) == True:
-                    break
-    
-        if (not orphan == False):
-            for i in range(3):
-                if g_grid[i][0] == 0:
-                    g_grid[i][0] = orphan.pop()
-                if (not orphan) ==True:
-                    break
-        if (not orphan == False):
-            for i in range(3):
-                if g_grid[i][2] == 0:
-                    g_grid[i][2] = orphan.pop()
-                if (not orphan) ==True:
-                    break    
-        
-        print_current()
-        print_goal()
-        
-        robot1.set_colors_owned(list(robot1.get_colors_owned().values()))
-        robot2.set_colors_owned(list(robot2.get_colors_owned().values()))
-        
-        robot1.set_colors_needed(list(robot1.get_colors_needed().values()))
-        robot2.set_colors_needed(list(robot2.get_colors_needed().values()))
+                if board.goal_board[i][2] == 0.0 and (not orphans)==False:
+                    board.goal_board[i][2] = key_list[val_list.index(orphans.pop())]  
+        #orphans is empty but check if robot2 has orphans that robot1 needs to take
+        else:    
+            #oprhan check
+            if (not needed2) == False: 
+                while (not needed2) == False:
+                    #check for needed orphans
+                    for i in range(3):
+                        if val_list[int(board.goal_board[i][2]-1)] in needed2_2 == False:
+                            orphans.append(board.goal_board[i][2])
+                            board.goal_board[i][2] = 0.0
+                            break                                
+                    #add in the ones that robot2 needs
+                    for i in range(3):
+                        if board.goal_board[i][2] == 0.0:
+                            board.goal_board[i][2] = key_list[val_list.index(needed2.pop())]
+                            break
+            #check if robot2 nee
+            if (not orphans)==False:
+                #add in the orphans
+                for i in range(3):
+                    if board.goal_board[i][0] == 0.0 and (not orphans)==False:
+                        board.goal_board[i][0] = key_list[val_list.index(orphans.pop())]              
+        #testing
+        board.print_current()
+        board.print_goal()
+        robot1.colors_needed
+        robot2.colors_needed
+                
+        #robot1.set_colors_owned(list(robot1.get_colors_owned().values()))
+        #robot2.set_colors_owned(list(robot2.get_colors_owned().values()))        
+        #robot1.set_colors_needed(list(robot1.get_colors_needed().values()))
+        #robot2.set_colors_needed(list(robot2.get_colors_needed().values()))
         
         #setting up a general heuristic for learning
         def h_general(agent,agent2,input_msg,side):
