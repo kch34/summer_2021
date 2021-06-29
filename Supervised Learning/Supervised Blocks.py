@@ -193,13 +193,32 @@ def pro():
         board.print_current()
         board.print_goal()
         robot1.colors_needed
+        robot1.colors_owned
         robot2.colors_needed
-                
-        #robot1.set_colors_owned(list(robot1.get_colors_owned().values()))
-        #robot2.set_colors_owned(list(robot2.get_colors_owned().values()))        
-        #robot1.set_colors_needed(list(robot1.get_colors_needed().values()))
-        #robot2.set_colors_needed(list(robot2.get_colors_needed().values()))
-        
+        robot2.colors_owned
+
+        #set the numeric values for colors owned and needed for both of them
+        #Set the first agents colors needed as numerics
+        temp = []
+        for i in robot1.colors_needed:
+            temp.append(key_list[val_list.index(i)])
+        robot1.set_colors_needed(temp)
+        #set the first agents colors owned as numerics
+        temp = []
+        for i in robot1.colors_owned:
+            temp.append(key_list[val_list.index(i)])
+        robot1.set_colors_owned(temp)
+        #Set the second agents colors needed as numerics
+        temp = []
+        for i in robot2.colors_needed:
+            temp.append(key_list[val_list.index(i)])
+        robot2.set_colors_needed(temp)
+        #set the second agents colors owned as numerics
+        temp = []
+        for i in robot2.colors_owned:
+            temp.append(key_list[val_list.index(i)])
+        robot2.set_colors_owned(temp)
+
         #setting up a general heuristic for learning
         def h_general(agent,agent2,input_msg,side):
             #get agent1's features
