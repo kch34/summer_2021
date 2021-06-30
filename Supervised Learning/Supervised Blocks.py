@@ -488,22 +488,22 @@ def pro():
             
             #sainity check for winning
             if(robot1.done == True and robot2.done == True):
+                """
                 print(" ")
                 print("Goal state reached")
                 print("Turns taken, " + str(turn_max-num_turns))
                 board.print_current()
                 board.print_goal()
+                """
                 temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
-                temp2 = turn_max-num_turns
-                
-                return temp1, temp2
-            
+                temp2 = turn_max-num_turns                
+                return temp1, temp2            
             print(" ")
 
     
 totalblocks = []
 totalturns = []
-for i in range(1):
+for i in range(5000):
     tb, tt = pro()
     totalblocks.append(tb)
     totalturns.append(tt)
