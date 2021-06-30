@@ -222,11 +222,11 @@ def pro():
         #setting up a general heuristic for learning
         def h_general(agent,agent2,input_msg,side):
             #get agent1's features
-            agent_owned = agent.get_colors_owned()
-            agent_needed = agent.get_colors_needed()
+            agent_owned = agent.colors_owned.copy()
+            agent_needed = agent.colors_needed.copy()
             #get agent2's features
-            agent2_owned = agent2.get_colors_owned()
-            agent2_needed = agent2.get_colors_needed()
+            agent2_owned = agent2.colors_owned.copy()
+            agent2_needed = agent2.colors_needed.copy()
             #flags for heuristic logic
             agent_needs_blocks = False
             agent_can_take_blocks = False
@@ -247,20 +247,24 @@ def pro():
                     color = msg_list[1]
                     i = int(msg_list[2])
                     j = int(msg_list[3])
+                    #Set the color to numerical value
+                    color = key_list[val_list.index(color)]                    
                     #now that we have the desired block data, we find it and move it
                     #Does the agent have needed blocks?
                     try:
                         for ii in range(3):
                             for jj in range(3):
-                                if c_grid[ii][jj] == color:
-                                   c_grid[ii][jj] = 0
-                                   c_grid[i][j] = color
+                                if board.board[ii][jj] == color:
+                                   board.board[ii][jj] = 0.0
+                                   board.board[i][j] = color
                                    raise Found
                     except Found:
                         #do nothing
                         n=5                      
                     agent_owned.remove(color)
-                    agent.set_colors_owned(agent_owned)
+                    agent.set_colors_owned(agent_owned)                    
+                    #set color back to a string
+                    color = val_list[key_list.index(color)]
                     output_msg = "moved " + color + " " + str(i) + " " + str(j)
                     agent.set_done(False)
                     return output_msg                                    
@@ -269,20 +273,22 @@ def pro():
                     if(agent_can_take_blocks == True):#agent has room to take blocks
                         print("I have room to take blocks")
                         #check the middle for blocks
-                        if middle == [0,0,0]:
+                        if middle == [0.0,0.0,0.0]:
                             #no blocks present so we ask for one
                             #find a block that the other agent has of ours and ask them to move it
                             for b in agent2_owned:
                                 if (b in agent_needed):
-                                    if(c_grid[0][1] == 0):
+                                    if(board.board[0][1] == 0.0):
                                         i = 0
                                         j = 1
-                                    elif(c_grid[1][1] == 0):
+                                    elif(board.board[1][1] == 0.0):
                                         i = 1
                                         j = 1
                                     else:
                                         i = 2
                                         j = 1
+                                    #switch the color from numeric to string
+                                    b = val_list[key_list.index(b)]
                                     output_msg = "move " + b + " " + str(i) + " " + str(j)
                                     agent.set_done(False)
                                     return output_msg
@@ -295,9 +301,9 @@ def pro():
                                     else:#set for the right agent
                                         j = 2
                                     #move the block
-                                    if(c_grid[0][j] == 0):
+                                    if(board.board[0][j] == 0.0):
                                         i = 0
-                                    elif(c_grid[1][j] == 0):
+                                    elif(board.board[1][j] == 0.0):
                                         i = 1
                                     else:
                                         i = 2
@@ -305,15 +311,17 @@ def pro():
                                     try:
                                         for ii in range(3):
                                             for jj in range(3):
-                                                if c_grid[ii][jj] == b:
-                                                   c_grid[ii][jj] = 0
-                                                   c_grid[i][j] = b
+                                                if board.board[ii][jj] == b:
+                                                   board.board[ii][jj] = 0.0
+                                                   board.board[i][j] = b
                                                    raise Found
                                     except Found:
                                         #do nothing
                                         n=5          
                                     agent_owned.append(b)
                                     agent.set_colors_owned(agent_owned)
+                                    #switch the color from numeric to string
+                                    b = val_list[key_list.index(b)]
                                     output_msg = "moved " + b + " " + str(i) + " " + str(j)
                                     agent.set_done(False)
                                     return output_msg
@@ -321,15 +329,17 @@ def pro():
                             #find a block that the other agent has of ours and ask them to move it
                             for b in agent2_owned:
                                 if (b in agent_needed):
-                                    if(c_grid[0][1] == 0):
+                                    if(board.board[0][1] == 0.0):
                                         i = 0
                                         j = 1
-                                    elif(c_grid[1][1] == 0):
+                                    elif(board.board[1][1] == 0.0):
                                         i = 1
                                         j = 1
                                     else:
                                         i = 2
                                         j = 1
+                                    #switch the color from numeric to string
+                                    b = val_list[key_list.index(b)]
                                     output_msg = "move " + b + " " + str(i) + " " + str(j)
                                     agent.set_done(False)
                                     return output_msg                    
@@ -338,10 +348,10 @@ def pro():
                         #check if agent owns blocks the other agent needs
                         for b in agent_owned:
                                 if (b in agent2_needed):
-                                    if(c_grid[0][1] == 0):
+                                    if(board.board[0][1] == 0.0):
                                         i = 0
                                         j = 1
-                                    elif(c_grid[1][1] == 0):
+                                    elif(board.board[1][1] == 0.0):
                                         i = 1
                                         j = 1
                                     else:
@@ -351,15 +361,17 @@ def pro():
                                     try:
                                         for ii in range(3):
                                             for jj in range(3):
-                                                if c_grid[ii][jj] == b:
-                                                   c_grid[ii][jj] = 0
-                                                   c_grid[i][j] = b
+                                                if board.board[ii][jj] == b:
+                                                   board.board[ii][jj] = 0.0
+                                                   board.board[i][j] = b
                                                    raise Found
                                     except Found:
                                         #do nothing
                                         n=5   
                                     agent_owned.remove(b)
                                     agent.set_colors_owned(agent_owned)
+                                    #switch the color from numeric to string
+                                    b = val_list[key_list.index(b)]
                                     output_msg = "moved " + b + " " + str(i) + " " + str(j)
                                     agent.set_done(False)
                                     return output_msg   
@@ -367,10 +379,10 @@ def pro():
                         #check for not needed blocks to move
                         for b in agent_owned:
                             if (b in agent_needed) == False:
-                                    if(c_grid[0][1] == 0):
+                                    if(board.board[0][1] == 0.0):
                                         i = 0
                                         j = 1
-                                    elif(c_grid[1][1] == 0):
+                                    elif(board.board[1][1] == 0.0):
                                         i = 1
                                         j = 1
                                     else:
@@ -380,15 +392,17 @@ def pro():
                                     try:
                                         for ii in range(3):
                                             for jj in range(3):
-                                                if c_grid[ii][jj] == b:
-                                                   c_grid[ii][jj] = 0
-                                                   c_grid[i][j] = b
+                                                if board.board[ii][jj] == b:
+                                                   board.board[ii][jj] = 0.0
+                                                   board.board[i][j] = b
                                                    raise Found
                                     except Found:
                                         #do nothing
                                         n=5   
                                     agent_owned.remove(b)
                                     agent.set_colors_owned(agent_owned)
+                                    #switch the color from numeric to string
+                                    b = val_list[key_list.index(b)]
                                     output_msg = "moved " + b + " " + str(i) + " " + str(j)
                                     agent.set_done(False)
                                     return output_msg                                                               
@@ -397,12 +411,12 @@ def pro():
                     if(agent_can_take_blocks == True):#agent has room to take blocks
                         print("I have room to take blocks")
                         #see if there is an orphan block
-                        if(c_grid[0][1] != 0):
-                            orphan = c_grid[0][1]
-                        elif(c_grid[1][1] != 0):
-                            orphan = c_grid[1][1]
-                        elif(c_grid[2][1] != 0):
-                            orphan = c_grid[2][1]    
+                        if(board.board[0][1] != 0.0):
+                            orphan = board.board[0][1]
+                        elif(board.board[1][1] != 0.0):
+                            orphan = board.board[1][1]
+                        elif(board.board[2][1] != 0.0):
+                            orphan = board.board[2][1]    
                         else:
                             output_msg = "I'm out of moves."
                             agent.set_done(True)
@@ -419,9 +433,9 @@ def pro():
                         else:#set for the right agent
                             j = 2
                         #move the block
-                        if(c_grid[0][j] == 0):
+                        if(board.board[0][j] == 0.0):
                             i = 0
-                        elif(c_grid[1][j] == 0):
+                        elif(board.board[1][j] == 0.0):
                             i = 1
                         else:
                             i = 2
@@ -429,15 +443,17 @@ def pro():
                         try:
                             for ii in range(3):
                                 for jj in range(3):
-                                    if c_grid[ii][jj] == b:
-                                        c_grid[ii][jj] = 0
-                                        c_grid[i][j] = b
+                                    if board.board[ii][jj] == b:
+                                        board.board[ii][jj] = 0.0
+                                        board.board[i][j] = b
                                         raise Found
                         except Found:
                             #do nothing
                             n=5          
                         agent_owned.append(b)
                         agent.set_colors_owned(agent_owned)
+                        #switch the color from numeric to string
+                        b = val_list[key_list.index(b)]
                         output_msg = "moved " + b + " " + str(i) + " " + str(j)
                         agent.set_done(False)
                         return output_msg                                                                                
@@ -461,7 +477,7 @@ def pro():
         game_log.append(txt)
         A = True
         
-        middle = [c_grid[0][1],c_grid[1][1],c_grid[2][1]]
+        middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
         
         while num_turns > 0 :
     
@@ -477,16 +493,16 @@ def pro():
             game_log.append(txt)
             #do the stuff
             num_turns-=1
-            middle = [c_grid[0][1],c_grid[1][1],c_grid[2][1]]
-            print_current()
+            middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
+            board.print_current()
             
             #sainity check for winning
             if(robot1.done == True and robot2.done == True):
                 print(" ")
                 print("Goal state reached")
                 print("Turns taken, " + str(turn_max-num_turns))
-                print_current()
-                print_goal()
+                board.print_current()
+                board.print_goal()
                 temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
                 temp2 = turn_max-num_turns
                 
