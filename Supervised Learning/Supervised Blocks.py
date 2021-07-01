@@ -30,6 +30,10 @@ class State:
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.boardHash = None
+    # get unique hash of current board state
+    def getHash(self):
+        self.boardHash = str(self.board.reshape(BOARD_COLS * BOARD_ROWS))
+        return self.boardHash
     #update the state
     def updateState(self, position,value):
         self.board[position] = value
@@ -503,7 +507,7 @@ def pro():
     
 totalblocks = []
 totalturns = []
-for i in range(5000):
+for i in range(2):
     tb, tt = pro()
     totalblocks.append(tb)
     totalturns.append(tt)

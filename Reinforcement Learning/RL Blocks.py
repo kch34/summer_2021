@@ -32,6 +32,35 @@ class State:
         self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
         self.boardHash = None
+    # get unique hash of current board state
+    def getHash(self):
+        self.boardHash = str(self.board.reshape(BOARD_COLS * BOARD_ROWS))
+        return self.boardHash
+    #update the state
+    def updateState(self, position,value):
+        self.board[position] = value
+    #print the current board state
+    def print_current(self):
+        print("Current state")
+        print(self.board[0])
+        print(self.board[1])
+        print(self.board[2])
+    #print the goal board state
+    def print_goal(self):
+        print("Goal State")
+        print(self.goal_board[0])
+        print(self.goal_board[1])
+        print(self.goal_board[2])        
+    #initialize the state 
+    def __init__(self):
+        self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.boardHash = None
+    # board reset
+    def reset(self):
+        self.board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.goal_board = np.zeros((BOARD_ROWS, BOARD_COLS))
+        self.boardHash = None
     #update the state
     def updateState(self, position,value):
         self.board[position] = value
