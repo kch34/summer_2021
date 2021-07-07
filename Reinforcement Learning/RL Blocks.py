@@ -235,6 +235,7 @@ def pro():
             agent2_owned = agent2.colors_owned.copy()
             agent2_needed = agent2.colors_needed.copy()
             #random actions
+            """
             #flags for  logic
             agent_needs_blocks = False
             agent_can_take_blocks = False
@@ -245,9 +246,9 @@ def pro():
             #can the agent take blocks?
             if len(agent_owned) < 3:
                 agent_can_take_blocks = True 
-                
+            """
             #does the agent want to take or give a block?
-            
+            x = random.random()
              
                 
                 
