@@ -1,15 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jun 16 14:46:15 2021
-
-@author: Hostl
-"""
-from multiprocessing import Process, freeze_support
-import sys, torch, copy, time, os, torchvision, gc
-import torch.nn as nn
-import random
-import statistics
-import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
@@ -77,7 +65,10 @@ class State:
                     positions.append((i, j))  # need to be tuple
         return positions
 
-    
+    def updateState(self, position):
+        self.board[position] = self.playerSymbol
+        # switch to another player
+        self.playerSymbol = -1 if self.playerSymbol == 1 else 1
 
     # only when game ends
     def giveReward(self):
@@ -276,24 +267,20 @@ class HumanPlayer:
         pass
 
 
-def main():
-    #need this for multithreading
-    if __name__ == '__main__':
-        freeze_support()
-        # training
-        p1 = Player("p1")
-        p2 = Player("p2")
-    
-        st = State(p1, p2)
-        print("training...")
-        st.play(50000)
-    
-        # play with human
-        p1 = Player("computer", exp_rate=0)
-        p1.loadPolicy("policy_p1")
-    
-        p2 = HumanPlayer("human")
-    
-        st = State(p1, p2)
-        st.play2()
-main()
+if __name__ == "__main__":
+    # training
+    p1 = Player("p1")
+    p2 = Player("p2")
+
+    st = State(p1, p2)
+    print("training...")
+    st.play(50000)
+
+    # play with human
+    p1 = Player("computer", exp_rate=0)
+    p1.loadPolicy("policy_p1")
+
+    p2 = HumanPlayer("human")
+
+    st = State(p1, p2)
+    st.play2()

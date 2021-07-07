@@ -157,21 +157,15 @@ def pro():
         needed2 = robot2.colors_needed.copy()
         needed2_2 = robot2.colors_needed.copy()
         #make a copy of the board state for the goal.
-        board.goal_board = copy.deepcopy(board.board)
-
-        
+        board.goal_board = copy.deepcopy(board.board)    
         add_left = []
-        add_right =[]
-        
+        add_right =[]        
         for i in range(3):
             if val_list[int(board.goal_board[i][0]-1)] in needed2_2:
-                board.goal_board[i][0] = 0.0 
-        
+                board.goal_board[i][0] = 0.0         
         for i in range(3):
             if val_list[int(board.goal_board[i][2]-1)] in needed1_1:
                 board.goal_board[i][2] = 0.0
-        
-        
         while (not needed1_1) == False:
             #try to add in the needed
             for i in range(3):
@@ -183,7 +177,6 @@ def pro():
                     if (val_list[int(board.goal_board[i][0]-1)] in needed1) == False:
                         add_right.append(board.goal_board[i][0])
                         board.goal_board[i][0] = 0.0
-        
         while (not needed2_2) == False:
             #try to add in the needed
             for i in range(3):
@@ -196,27 +189,19 @@ def pro():
                         add_left.append(board.goal_board[i][2])
                         board.goal_board[i][2] = 0.0
                         break
-        
-        
         if (not add_left) == False:
             for i in range(3):
                 if board.goal_board[i][0] == 0.0 and (not add_left) == False:
-                    board.goal_board[i][0] = add_left.pop(0)
-                    
+                    board.goal_board[i][0] = add_left.pop(0)           
         if (not add_right) == False:
             for i in range(3):
                 if board.goal_board[i][2] == 0.0 and (not add_right) == False:
                     board.goal_board[i][2] = add_right.pop(0)      
-        
         #testing
         board.print_current()
         board.print_goal()
         print(robot1.colors_needed)
         print(robot2.colors_needed)
-        
-        
-        
-       
 
         #set the numeric values for colors owned and needed for both of them
         #Set the first agents colors needed as numerics
@@ -239,3 +224,85 @@ def pro():
         for i in robot2.colors_owned:
             temp.append(key_list[val_list.index(i)])
         robot2.set_colors_owned(temp)
+
+
+        #the reinforcement learning heuristic
+        def rl_random(agent,agent2,input_msg,side):
+            #get agent1's features
+            agent_owned = agent.colors_owned.copy()
+            agent_needed = agent.colors_needed.copy()
+            #get agent2's features
+            agent2_owned = agent2.colors_owned.copy()
+            agent2_needed = agent2.colors_needed.copy()
+            #random actions
+            #flags for  logic
+            agent_needs_blocks = False
+            agent_can_take_blocks = False
+            #Does the agent need a block?
+            for b in agent_needed:
+                if (b in agent_owned) == False:
+                    agent_needs_blocks = True
+            #can the agent take blocks?
+            if len(agent_owned) < 3:
+                agent_can_take_blocks = True 
+                
+            #does the agent want to take or give a block?
+            
+             
+                
+                
+                
+        #setting up the model
+        
+        #training the model
+        #first we set the turn timeout
+        num_turns = 50
+        turn_max = 50
+        game_log = []
+        txt = "Game Start"
+        print(txt)
+        print("  ")
+        game_log.append(txt)
+        A = True
+        
+        middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
+        
+        while num_turns > 0 :
+    
+            if A==True:
+                print(robot1.name)
+                txt = rl_random(robot1,robot2,game_log[-1],"left")
+                A = False
+            else:
+                print(robot2.name)
+                txt = rl_random(robot2,robot1,game_log[-1],"right")            
+                A = True
+            print(txt)
+            game_log.append(txt)
+            #do the stuff
+            num_turns-=1
+            middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
+            board.print_current()
+            
+            #sainity check for winning
+            if(robot1.done == True and robot2.done == True):                
+                print(" ")
+                print("Goal state reached")
+                print("Turns taken, " + str(turn_max-num_turns))
+                board.print_current()
+                board.print_goal()                
+                temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
+                temp2 = turn_max-num_turns                
+                return temp1, temp2            
+            print(" ")
+            
+
+totalblocks = []
+totalturns = []
+for i in range(2):
+    tb, tt = pro()
+    totalblocks.append(tb)
+    totalturns.append(tt)
+    
+plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
+plt.hist(totalturns, color = 'green', edgecolor = 'black',bins = int(50))
