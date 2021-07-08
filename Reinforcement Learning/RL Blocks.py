@@ -235,7 +235,6 @@ def pro():
             agent2_owned = agent2.colors_owned.copy()
             agent2_needed = agent2.colors_needed.copy()
             #random actions
-            """
             #flags for  logic
             agent_needs_blocks = False
             agent_can_take_blocks = False
@@ -243,12 +242,51 @@ def pro():
             for b in agent_needed:
                 if (b in agent_owned) == False:
                     agent_needs_blocks = True
+                    break
+            if agent_needs_blocks == True:
+                print("I need blocks.")
             #can the agent take blocks?
             if len(agent_owned) < 3:
                 agent_can_take_blocks = True 
-            """
+                print("I have room to take blocks.") 
+                
+            #set the done state if the agent has needed blocks.
+            if agent_needs_blocks == False:
+                agent.set_done(True)
+                
             #does the agent want to take or give a block?
-            x = random.random()
+            choice = random.random()
+            
+            
+            """
+            give a block            
+            
+                check if i need it
+                    #has checked                     
+                dont check if i need it
+                    #didn't check'
+                
+                check if they need it
+                    #has checked
+                dont check if they need it
+                    #didnt check
+                    
+                #move the block
+                    #moves block to same column
+                    #moves block to middle column
+
+            take a block
+            
+            
+            do nothing
+            """
+            
+            
+            
+            
+            
+                
+            
              
                 
                 
@@ -300,7 +338,7 @@ def pro():
 
 totalblocks = []
 totalturns = []
-for i in range(2):
+for i in range(1):
     tb, tt = pro()
     totalblocks.append(tb)
     totalturns.append(tt)
