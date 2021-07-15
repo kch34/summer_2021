@@ -4,10 +4,14 @@ Created on Tue Jun 15 12:28:22 2021
 @author: Hostl
 """
 #imports
-from multiprocessing import freeze_support  #needed due to windows processing
+from multiprocessing import freeze_support  #needed due to windows 
+from multiprocessing.dummy import Pool as ThreadPool
+import multiprocessing as mp
+from joblib import Parallel, delayed
 #import sys, torch, copy, time, os, torchvision, gc   
 #import torch.nn as nn
 import random
+import torch
 #import statistics
 import matplotlib.pyplot as plt
 from collections import Counter
@@ -21,6 +25,10 @@ BOARD_COLS = 3
 colors = {1:"black",2:"blue",3:"white",4:"red",5:"yellow",6:"pink"}
 key_list = list(colors.keys())
 val_list = list(colors.values())
+totalblocks = []
+totalturns = []
+score_log = []
+game_log = []
 #the board class
 class State:
     #initialize the state 
@@ -142,9 +150,9 @@ robot2 = botty('zach')
 #the main code to be used for looping
 def pro(robot1,robot2):
     #need this for multithreading
-    if __name__ == '__main__':
+    #if __name__ == '__main__':
         #used for multithreading
-        freeze_support()        
+        #freeze_support()        
         #the main board to be manipulated
         board = State()
         #we set the current color set to be used
@@ -348,12 +356,12 @@ def pro(robot1,robot2):
             #set the move motive based on the above information
             if((agent.checked_for_asked==True)and(agent.was_asked==True)):
                 #set the give motive
-                agent.give_motive       = 0.05
+                agent.give_motive       += 0.05
             
             #set the ask motive and take motive
             if((agent_needs_blocks==True)and(agent_can_take_blocks==True)):
-                agent.try_to_ask_motive = 0.05
-                agent.take_motive       = 0.05        
+                agent.try_to_ask_motive += 0.05
+                agent.take_motive       += 0.05        
             
             if(agent_needs_blocks==False):
                 agent.set_done(True)
@@ -361,6 +369,12 @@ def pro(robot1,robot2):
             else:
                 agent.set_done(False)
                 agent.has_needed = False
+                
+            if (0.0 in middle) == False:
+                agent.take_motive       += 0.20
+                
+            if((agent_needs_blocks==False)and(agent_can_take_blocks==True)):
+                agent.take_motive       += 0.10
             
             #the decision loop
             while True:            
@@ -626,7 +640,11 @@ def pro(robot1,robot2):
                         board.print_goal()                
                         temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
                         temp2 = turn_max-num_turns                
-                        return temp1, temp2, game_log, score
+                        totalblocks.append(temp1)
+                        totalturns.append(temp2)     
+                        game_log.append(game_log)
+                        score_log.append(score)
+                        return 
             print(" ")
         
         print(" ")
@@ -635,26 +653,31 @@ def pro(robot1,robot2):
         board.print_current()
         board.print_goal()                
         temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
-        temp2 = turn_max-num_turns                
-        return temp1, temp2, game_log, score
+        temp2 = turn_max-num_turns      
+        totalblocks.append(temp1)
+        totalturns.append(temp2)     
+        game_log.append(game_log)
+        score_log.append(score)
+        return 
             
 
-totalblocks = []
-totalturns = []
-score_log = []
-amount = 1
-for i in tqdm(range(amount)):
-    tb, tt, g_log, score = pro(robot1,robot2)
-    totalblocks.append(tb)
-    totalturns.append(tt)
-    score_log.append(score)
-
-# driver program
-x = 'L'
-y = 'W'
-d = Counter(score_log)
-print('{} has occurred {} times'.format(x, d[x]))
-print('{} has occurred {} times'.format(y, d[y]))
+#need this for multithreading
+if __name__ == '__main__':
+   #used for multithreading
+   freeze_support()   
+   totalblocks = []
+   totalturns = []
+   score_log = []
+   game_log = []
+   amount = 10000
+   for i in tqdm(range(amount)):
+       pro(robot1,robot2)
+   # driver program
+   x = 'L'
+   y = 'W'
+   d = Counter(score_log)
+   print('{} has occurred {} times'.format(x, d[x]))
+   print('{} has occurred {} times'.format(y, d[y]))
     
-plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
-plt.hist(totalturns, color = 'green', edgecolor = 'black',bins = int(50))
+   plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
+   plt.hist(totalturns, color = 'green', edgecolor = 'black',bins = int(50))

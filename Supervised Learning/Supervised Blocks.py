@@ -11,6 +11,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import copy
+from tqdm import tqdm
 #set the size of the board
 BOARD_ROWS = 3
 BOARD_COLS = 3
@@ -507,7 +508,8 @@ def pro():
     
 totalblocks = []
 totalturns = []
-for i in range(2):
+amount = 10000
+for i in tqdm(range(amount)):
     tb, tt = pro()
     totalblocks.append(tb)
     totalturns.append(tt)
