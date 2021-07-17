@@ -8,6 +8,7 @@ from multiprocessing import freeze_support  #needed due to windows
 from multiprocessing.dummy import Pool as ThreadPool
 import multiprocessing as mp
 from joblib import Parallel, delayed
+import pickle
 #import sys, torch, copy, time, os, torchvision, gc   
 #import torch.nn as nn
 import random
@@ -29,6 +30,7 @@ totalblocks = []
 totalturns = []
 score_log = []
 game_log = []
+epochs = 0
 #the board class
 class State:
     #initialize the state 
@@ -243,10 +245,10 @@ def pro(robot1,robot2):
                 if board.goal_board[i][2] == 0.0 and (not add_right) == False:
                     board.goal_board[i][2] = add_right.pop(0)      
         #testing
-        board.print_current()
-        board.print_goal()
-        print(robot1.colors_needed)
-        print(robot2.colors_needed)
+        #board.print_current()
+        #board.print_goal()
+        #print(robot1.colors_needed)
+        #print(robot2.colors_needed)
 
         #set the numeric values for colors owned and needed for both of them
         #Set the first agents colors needed as numerics
@@ -370,7 +372,7 @@ def pro(robot1,robot2):
                 agent.set_done(False)
                 agent.has_needed = False
                 
-            if (0.0 in middle) == False:
+            if (0.0 in middle) == True:
                 agent.take_motive       += 0.20
                 
             if((agent_needs_blocks==False)and(agent_can_take_blocks==True)):
@@ -380,7 +382,7 @@ def pro(robot1,robot2):
             while True:            
                 #reset parameters
                 agent.checked_my_needed  = False
-                agent.check_their_needed = False
+                agent.checked_their_needed = False
                 agent.motive = 0.0
                 #set the choice parameters
                 floor = 0.000
@@ -398,7 +400,8 @@ def pro(robot1,robot2):
                     j = 2
                     j2 =0
                 #find out if the choice is to attempt to give a block
-                if (choice <= first):                
+                if (choice <= first):     
+                    agent.give_motive = 0.0
                     #go through the current agents blocks
                     for i in range(3):
                       #check if i need it
@@ -420,7 +423,7 @@ def pro(robot1,robot2):
                       choice = random.random()
                       if (choice <= agent.check_their_needed):
                           #set the bool
-                          agent.check_their_needed = True
+                          agent.checked_their_needed = True
                           #give a reinforcemnt
                           agent.check_their_needed += 0.01
                           #do they need the block?
@@ -476,6 +479,7 @@ def pro(robot1,robot2):
                         
                 #find out if the choice is to attempt to take a block
                 elif((choice>first)and(choice<=second)):
+                    agent.take_motive = 0.0
                     #go through the middle blocks
                     jj = 1
                     for ii in range(3):                        
@@ -499,7 +503,7 @@ def pro(robot1,robot2):
                       choice = random.random()
                       if (choice <= agent.check_their_needed):
                           #set the bool
-                          agent.check_their_needed = True
+                          agent.checked_their_needed = True
                           #give a reinforcemnt
                           agent.check_their_needed += 0.01
                           #do they need the block?
@@ -541,6 +545,7 @@ def pro(robot1,robot2):
                           return output_msg                    
                 #attempt to ask for a block
                 elif((choice>second+first)and(choice<=roof)):
+                    agent.try_to_ask_motive = 0.0
                     #go through the current agents blocks
                     for i in range(3):
                     #check if i need it
@@ -562,7 +567,7 @@ def pro(robot1,robot2):
                       choice = random.random()
                       if (choice <= agent.check_their_needed):
                           #set the bool
-                          agent.check_their_needed = True
+                          agent.checked_their_needed = True
                           #give a reinforcemnt
                           agent.check_their_needed += 0.01
                           #do they need the block?
@@ -598,8 +603,8 @@ def pro(robot1,robot2):
                           return output_msg                                        
 
         #first we set the turn timeout
-        num_turns = 50
-        turn_max = 50
+        num_turns = epochs
+        turn_max = epochs
         game_log = []
         score = 'L'
         txt = "Game Start"
@@ -625,7 +630,7 @@ def pro(robot1,robot2):
             #do the stuff
             num_turns-=1
             middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
-            board.print_current()
+            #board.print_current()
             
             #sainity check for winning
             if(robot1.done == True and robot2.done == True):                              
@@ -636,8 +641,8 @@ def pro(robot1,robot2):
                         print(" ")
                         print("Goal state reached")
                         print("Turns taken, " + str(turn_max-num_turns))
-                        board.print_current()
-                        board.print_goal()                
+                        #board.print_current()
+                        #board.print_goal()                
                         temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
                         temp2 = turn_max-num_turns                
                         totalblocks.append(temp1)
@@ -650,8 +655,8 @@ def pro(robot1,robot2):
         print(" ")
         print("Game Time Out")
         print("Turns taken, " + str(turn_max-num_turns))
-        board.print_current()
-        board.print_goal()                
+        #board.print_current()
+        #board.print_goal()                
         temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
         temp2 = turn_max-num_turns      
         totalblocks.append(temp1)
@@ -660,15 +665,23 @@ def pro(robot1,robot2):
         score_log.append(score)
         return 
             
-
+    
+"""
+# Reload the file
+robot1 = pickle.load(open("r1_1000.pickle", "rb"))
+# Reload the file
+robot2 = pickle.load(open("r2_1000.pickle", "rb"))    
+"""
 #need this for multithreading
 if __name__ == '__main__':
+    
    #used for multithreading
    freeze_support()   
    totalblocks = []
    totalturns = []
    score_log = []
    game_log = []
+   epochs = 2000
    amount = 10000
    for i in tqdm(range(amount)):
        pro(robot1,robot2)
@@ -678,6 +691,18 @@ if __name__ == '__main__':
    d = Counter(score_log)
    print('{} has occurred {} times'.format(x, d[x]))
    print('{} has occurred {} times'.format(y, d[y]))
+   print('{} Average turns taken.'.format(round(sum(totalturns)/len(totalturns))))
+   print(robot1.colors_needed)
+   print(robot2.colors_needed)
     
-   plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
+   #plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
    plt.hist(totalturns, color = 'green', edgecolor = 'black',bins = int(50))
+   
+   #test 1 is train 1000 then test on 50 or 100
+   #test 2 is train 2000
+   
+   # Save the file
+   pickle.dump(robot1, file = open("robot1_2000.pickle", "wb"))
+   #save the file
+   pickle.dump(robot2, file = open("robot2_2000.pickle", "wb"))
+   
