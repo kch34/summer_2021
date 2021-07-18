@@ -28,6 +28,7 @@ key_list = list(colors.keys())
 val_list = list(colors.values())
 totalblocks = []
 totalturns = []
+w_turns    = []
 score_log = []
 game_log = []
 epochs = 0
@@ -649,6 +650,7 @@ def pro(robot1,robot2):
                         totalturns.append(temp2)     
                         game_log.append(game_log)
                         score_log.append(score)
+                        w_turns.append(temp2)
                         return 
             print(" ")
         
@@ -663,6 +665,7 @@ def pro(robot1,robot2):
         totalturns.append(temp2)     
         game_log.append(game_log)
         score_log.append(score)
+        w_turns.append(temp2)
         return 
             
     
@@ -681,8 +684,9 @@ if __name__ == '__main__':
    totalturns = []
    score_log = []
    game_log = []
+   w_turns = []
    epochs = 2000
-   amount = 10000
+   amount = 1000000
    for i in tqdm(range(amount)):
        pro(robot1,robot2)
    # driver program
@@ -692,6 +696,7 @@ if __name__ == '__main__':
    print('{} has occurred {} times'.format(x, d[x]))
    print('{} has occurred {} times'.format(y, d[y]))
    print('{} Average turns taken.'.format(round(sum(totalturns)/len(totalturns))))
+   print('{} Average Goal Completion turns taken.'.format(round(sum(w_turns)/len(w_turns))))
    print(robot1.colors_needed)
    print(robot2.colors_needed)
     
@@ -702,7 +707,7 @@ if __name__ == '__main__':
    #test 2 is train 2000
    
    # Save the file
-   pickle.dump(robot1, file = open("robot1_2000.pickle", "wb"))
+   pickle.dump(robot1, file = open("robot1_2000_100k.pickle", "wb"))
    #save the file
-   pickle.dump(robot2, file = open("robot2_2000.pickle", "wb"))
+   pickle.dump(robot2, file = open("robot2_2000_100k.pickle", "wb"))
    
