@@ -99,6 +99,12 @@ class botty:
         self.checked_my_needed    = False
         self.checked_their_needed = False
         self.checked_for_orphans  = False
+        self.check_zero           = 1/2
+        self.checked_zero         = False
+        self.check_middle         = 1/2
+        self.checked_middle       = False
+        self.check_self           = 1/2
+        self.checked_self         = False
         self.reward               = 0.0
         self.motive               = 0.0
         self.ask_motive           = 0.0
@@ -122,7 +128,13 @@ class botty:
         self.ask_motive           = 0.0
         self.give_motive          = 0.0
         self.take_motive          = 0.0
-        self.try_to_ask_motive    = 0.0            
+        self.try_to_ask_motive    = 0.0      
+        self.check_zero           = 1/2
+        self.check_middle         = 1/2
+        self.check_self           = 1/2
+        self.checked_self         = False
+        self.checked_middle       = False
+        self.checked_zero         = False
         self.was_asked            = False
         self.checked_for_asked    = False
         self.checked_my_needed    = False
@@ -246,11 +258,12 @@ def pro(robot1,robot2):
                 if board.goal_board[i][2] == 0.0 and (not add_right) == False:
                     board.goal_board[i][2] = add_right.pop(0)      
         #testing
-        #board.print_current()
-        #board.print_goal()
-        #print(robot1.colors_needed)
-        #print(robot2.colors_needed)
-
+        """
+        board.print_current()
+        board.print_goal()
+        print(robot1.colors_needed)
+        print(robot2.colors_needed)
+        """
         #set the numeric values for colors owned and needed for both of them
         #Set the first agents colors needed as numerics
         temp = []
@@ -289,6 +302,8 @@ def pro(robot1,robot2):
             agent.take_motive          = 0.0
             agent.try_to_ask_motive    = 0.0
             #reset the agents flags to default false
+            agent.checked_middle       = False
+            agent.checked_zero         = False 
             agent.was_asked            = False
             agent.checked_for_asked    = False
             agent.checked_my_needed    = False
@@ -373,9 +388,15 @@ def pro(robot1,robot2):
                 agent.set_done(False)
                 agent.has_needed = False
                 
-            if (0.0 in middle) == True:
-                agent.take_motive       += 0.20
                 
+            m_choice = random.random()
+            if (m_choice <= agent.check_middle):
+                agent.check_middle+=0.01
+                if (0.0 in middle) == False:
+                    agent.take_motive       += 0.40
+                if (0.0 in middle) == True:
+                    agent.take_motive       += 0.20
+                                       
             if((agent_needs_blocks==False)and(agent_can_take_blocks==True)):
                 agent.take_motive       += 0.10
             
@@ -402,9 +423,23 @@ def pro(robot1,robot2):
                     j2 =0
                 #find out if the choice is to attempt to give a block
                 if (choice <= first):     
-                    agent.give_motive = 0.0
+                    agent.give_motive = -.25
                     #go through the current agents blocks
                     for i in range(3):
+                    #zero value
+                      z_choice = random.random()
+                      #decide to check if the block is zero
+                      if (z_choice <= agent.check_zero):
+                          agent.check_zero+= 0.01
+                          #smack if the agent tries to take a zero
+                          if(board.board[i][j] == 0.0):
+                            continue   
+                      m_choice = random.random()
+                      if (m_choice <= agent.check_middle):
+                        agent.check_middle+=0.01
+                        if (0.0 in middle) == False:
+                            agent.check_middle+=0.01
+                            continue
                       #check if i need it
                       #choice to check own blocks
                       choice = random.random()
@@ -480,10 +515,18 @@ def pro(robot1,robot2):
                         
                 #find out if the choice is to attempt to take a block
                 elif((choice>first)and(choice<=second)):
-                    agent.take_motive = 0.0
+                    agent.take_motive = -.25
                     #go through the middle blocks
                     jj = 1
-                    for ii in range(3):                        
+                    for ii in range(3):
+                      #zero value
+                      z_choice = random.random()
+                      #decide to check if the block is zero
+                      if (z_choice <= agent.check_zero):
+                          agent.check_zero+= 0.01
+                          #smack if the agent tries to take a zero
+                          if(board.board[ii][jj] == 0.0):
+                            continue                                            
                       #non-zero value
                       #check if i need it
                       #choice to check own blocks
@@ -521,7 +564,7 @@ def pro(robot1,robot2):
                       if ((choice+agent.motive)>= .50):
                           #smack if the agent tries to take a zero
                           if(board.board[ii][jj] == 0.0):
-                              return "Tried to take zero value."      
+                            return "Tried to take zero value." 
                           #attempt to take the block to an empty position 
                           if(board.board[0][j] == 0.0):
                               iii = 0
@@ -543,13 +586,21 @@ def pro(robot1,robot2):
                           #switch the color from numeric to string
                           b = val_list[key_list.index(color)]
                           output_msg = "moved " + b + " " + str(iii) + " " + str(jjj)
-                          return output_msg                    
+                          return output_msg                                          
                 #attempt to ask for a block
                 elif((choice>second+first)and(choice<=roof)):
                     agent.try_to_ask_motive = 0.0
                     #go through the current agents blocks
                     for i in range(3):
                     #check if i need it
+                      #zero value
+                      z_choice = random.random()
+                      #decide to check if the block is zero
+                      if (z_choice >= .50):
+                          agent.check_zero+= 0.01
+                          #smack if the agent tries to take a zero
+                          if(board.board[i][j2] == 0.0):
+                            continue   
                       #choice to check own blocks
                       choice = random.random()
                       if (choice <= agent.check_my_needed):
@@ -631,7 +682,7 @@ def pro(robot1,robot2):
             #do the stuff
             num_turns-=1
             middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
-            board.print_current()
+            #board.print_current()
             
             #sainity check for winning
             if(robot1.done == True and robot2.done == True):                              
@@ -642,8 +693,8 @@ def pro(robot1,robot2):
                         print(" ")
                         print("Goal state reached")
                         print("Turns taken, " + str(turn_max-num_turns))
-                        board.print_current()
-                        board.print_goal()                
+                        #board.print_current()
+                        #board.print_goal()                
                         temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
                         temp2 = turn_max-num_turns                
                         totalblocks.append(temp1)
@@ -669,11 +720,12 @@ def pro(robot1,robot2):
         return 
             
     
-
+"""
 # Reload the file
 robot1 = pickle.load(open("robot1_2000_1m.pickle", "rb"))
 # Reload the file
 robot2 = pickle.load(open("robot2_2000_1m.pickle", "rb"))    
+"""
 
 #need this for multithreading
 if __name__ == '__main__':    
@@ -684,8 +736,8 @@ if __name__ == '__main__':
    score_log = []
    game_log = []
    w_turns = []
-   epochs = 200
-   amount = 10000
+   epochs = 100
+   amount = 240000
    for i in tqdm(range(amount)):
        pro(robot1,robot2)
    # driver program
@@ -704,9 +756,9 @@ if __name__ == '__main__':
    
    #test 1 is train 1000 then test on 50 or 100
    #test 2 is train 2000
-   """
+
    # Save the file
-   pickle.dump(robot1, file = open("robot1_2000_100k.pickle", "wb"))
+   pickle.dump(robot1, file = open("robot1_100_240k_new.pickle", "wb"))
    #save the file
-   pickle.dump(robot2, file = open("robot2_2000_100k.pickle", "wb"))
-   """
+   pickle.dump(robot2, file = open("robot2_100_240k_new.pickle", "wb"))
+   
