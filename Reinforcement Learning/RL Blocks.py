@@ -631,7 +631,7 @@ def pro(robot1,robot2):
             #do the stuff
             num_turns-=1
             middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
-            #board.print_current()
+            board.print_current()
             
             #sainity check for winning
             if(robot1.done == True and robot2.done == True):                              
@@ -642,8 +642,8 @@ def pro(robot1,robot2):
                         print(" ")
                         print("Goal state reached")
                         print("Turns taken, " + str(turn_max-num_turns))
-                        #board.print_current()
-                        #board.print_goal()                
+                        board.print_current()
+                        board.print_goal()                
                         temp1 = len(robot1.colors_owned)+len(robot2.colors_owned)
                         temp2 = turn_max-num_turns                
                         totalblocks.append(temp1)
@@ -669,15 +669,14 @@ def pro(robot1,robot2):
         return 
             
     
-"""
+
 # Reload the file
-robot1 = pickle.load(open("r1_1000.pickle", "rb"))
+robot1 = pickle.load(open("robot1_2000_1m.pickle", "rb"))
 # Reload the file
-robot2 = pickle.load(open("r2_1000.pickle", "rb"))    
-"""
+robot2 = pickle.load(open("robot2_2000_1m.pickle", "rb"))    
+
 #need this for multithreading
-if __name__ == '__main__':
-    
+if __name__ == '__main__':    
    #used for multithreading
    freeze_support()   
    totalblocks = []
@@ -685,8 +684,8 @@ if __name__ == '__main__':
    score_log = []
    game_log = []
    w_turns = []
-   epochs = 2000
-   amount = 1000000
+   epochs = 200
+   amount = 10000
    for i in tqdm(range(amount)):
        pro(robot1,robot2)
    # driver program
@@ -705,9 +704,9 @@ if __name__ == '__main__':
    
    #test 1 is train 1000 then test on 50 or 100
    #test 2 is train 2000
-   
+   """
    # Save the file
    pickle.dump(robot1, file = open("robot1_2000_100k.pickle", "wb"))
    #save the file
    pickle.dump(robot2, file = open("robot2_2000_100k.pickle", "wb"))
-   
+   """
