@@ -99,11 +99,8 @@ class botty:
         self.checked_my_needed    = False
         self.checked_their_needed = False
         self.checked_for_orphans  = False
-        self.check_zero           = 1/2
         self.checked_zero         = False
-        self.check_middle         = 1/2
         self.checked_middle       = False
-        self.check_self           = 1/2
         self.checked_self         = False
         self.reward               = 0.0
         self.motive               = 0.0
