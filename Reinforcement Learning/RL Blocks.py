@@ -388,11 +388,11 @@ def pro(robot1,robot2):
                 
             m_choice = random.random()
             if (m_choice <= agent.check_middle):
-                agent.check_middle+=0.01
+                agent.check_middle+=0.15
                 if (0.0 in middle) == False:
-                    agent.take_motive       += 0.40
-                if (0.0 in middle) == True:
                     agent.take_motive       += 0.20
+                if (0.0 in middle) == True:
+                    agent.take_motive       += 0.10
                                        
             if((agent_needs_blocks==False)and(agent_can_take_blocks==True)):
                 agent.take_motive       += 0.10
@@ -430,12 +430,13 @@ def pro(robot1,robot2):
                           agent.check_zero+= 0.01
                           #smack if the agent tries to take a zero
                           if(board.board[i][j] == 0.0):
+                            agent.check_zero+= 0.15
                             continue   
                       m_choice = random.random()
                       if (m_choice <= agent.check_middle):
                         agent.check_middle+=0.01
                         if (0.0 in middle) == False:
-                            agent.check_middle+=0.01
+                            agent.check_middle+=0.15
                             continue
                       #check if i need it
                       #choice to check own blocks
@@ -449,7 +450,7 @@ def pro(robot1,robot2):
                           if (board.board[i][j] in agent.colors_needed) == True:
                               #the current agent does need it                              
                               #give a reinforcemnt
-                              agent.check_my_needed += 0.05
+                              agent.check_my_needed += 0.15
                               #set the motive much lower to not move the block
                               agent.motive += -0.20                              
                       #check if they need 
@@ -463,7 +464,7 @@ def pro(robot1,robot2):
                           if (board.board[i][j] in agent2.colors_needed) == True:                              
                               #the other agent does need it
                               #give a reinforcemnt
-                              agent.check_their_needed += 0.05
+                              agent.check_their_needed += 0.15
                               #set the motive much higher to move the block
                               agent.motive += 0.20
                               
@@ -523,6 +524,7 @@ def pro(robot1,robot2):
                           agent.check_zero+= 0.01
                           #smack if the agent tries to take a zero
                           if(board.board[ii][jj] == 0.0):
+                            agent.check_zero+= 0.15
                             continue                                            
                       #non-zero value
                       #check if i need it
@@ -537,7 +539,7 @@ def pro(robot1,robot2):
                           if (board.board[ii][jj] in agent.colors_needed) == True:
                               #the current agent does need it                              
                               #give a reinforcemnt
-                              agent.check_my_needed += 0.05
+                              agent.check_my_needed += 0.15
                               #set the motive much lower to not move the block
                               agent.motive += 0.20     
                       #check if they need 
@@ -551,7 +553,7 @@ def pro(robot1,robot2):
                           if (board.board[ii][jj] in agent2.colors_needed) == True:                              
                               #the other agent does need it
                               #give a reinforcemnt
-                              agent.check_their_needed += 0.05
+                              agent.check_their_needed += 0.15
                               #set the motive much higher to move the block
                               agent.motive += -0.20
                       
@@ -597,6 +599,7 @@ def pro(robot1,robot2):
                           agent.check_zero+= 0.01
                           #smack if the agent tries to take a zero
                           if(board.board[i][j2] == 0.0):
+                            agent.check_zero+= 0.15
                             continue   
                       #choice to check own blocks
                       choice = random.random()
@@ -609,7 +612,7 @@ def pro(robot1,robot2):
                           if (board.board[i][j] in agent.colors_needed) == True:
                               #the current agent does need it                              
                               #give a reinforcemnt
-                              agent.check_my_needed += 0.05
+                              agent.check_my_needed += 0.15
                               #set the motive much lower to not move the block
                               agent.motive += 0.20                              
                       #check if they need 
@@ -623,7 +626,7 @@ def pro(robot1,robot2):
                           if (board.board[i][j] in agent2.colors_needed) == True:                              
                               #the other agent does need it
                               #give a reinforcemnt
-                              agent.check_their_needed += 0.05
+                              agent.check_their_needed += 0.15
                               #set the motive much higher to move the block
                               agent.motive += -0.20
                       #decide to take or not          
@@ -733,8 +736,8 @@ if __name__ == '__main__':
    score_log = []
    game_log = []
    w_turns = []
-   epochs = 100
-   amount = 240000
+   epochs = 90
+   amount = 500000
    for i in tqdm(range(amount)):
        pro(robot1,robot2)
    # driver program
@@ -753,9 +756,7 @@ if __name__ == '__main__':
    
    #test 1 is train 1000 then test on 50 or 100
    #test 2 is train 2000
-
    # Save the file
-   pickle.dump(robot1, file = open("robot1_100_240k_new.pickle", "wb"))
+   pickle.dump(robot1, file = open("robot1_90_500k_new3.pickle", "wb"))
    #save the file
-   pickle.dump(robot2, file = open("robot2_100_240k_new.pickle", "wb"))
-   
+   pickle.dump(robot2, file = open("robot2_90_500k_new3.pickle", "wb"))
