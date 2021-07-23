@@ -522,8 +522,12 @@ def pro(robot1,robot2):
             if (m_choice <= agent.check_middle):
                 agent.check_middle+=0.01
                 if (0.0 in middle) == False:
-                    agent.take_motive       += 0.20                
+                    agent.take_motive       += 0.35                
                                                 
+                    
+            reward = 0.35
+            penalty= -0.35
+                    
             #the decision loop
             while True:                            
                 agent.motive = 0.0
@@ -556,13 +560,13 @@ def pro(robot1,robot2):
                           #smack if the agent tries to take a zero
                           if(board.board[i][j] == 0.0):
                             agent.check_zero+= 0.05
-                            agent.motive+= -0.35                            
+                            agent.motive+= penalty                            
                       #check if the middle is full
                       if (m_choice <= agent.check_middle):
                         agent.check_middle+=0.01
                         if (0.0 in middle) == False:
                             agent.check_middle+=0.05
-                            agent.motive+= -0.35                            
+                            agent.motive+= penalty                            
                       #check if agent needs the block
                       #choice to check own blocks                      
                       if (c_choice <= agent.check_my_needed):
@@ -574,10 +578,10 @@ def pro(robot1,robot2):
                               #give a reinforcemnt
                               agent.check_my_needed += 0.05
                               #set the motive much lower to not move the block
-                              agent.motive += -0.35  
+                              agent.motive += penalty  
                       #check if they need 
                       if agent_has_agent2_blocks == True:
-                          c_choice2 += -0.35
+                          c_choice2 += penalty
                       if (c_choice2 <= agent.check_their_needed):
                           #give a reinforcemnt
                           agent.check_their_needed += 0.01
@@ -587,11 +591,11 @@ def pro(robot1,robot2):
                               #give a reinforcemnt
                               agent.check_their_needed += 0.05
                               #set the motive much higher to move the block
-                              agent.motive += 0.35
+                              agent.motive += reward
                       #asked_check
                       if((agent.checked_for_asked==True)and(agent.was_asked==True)):
                          if(board.board[i][j] == color_asked):
-                              agent.motive += 0.35                             
+                              agent.motive += reward                            
                       #forward thinking decision                      
                       #forward think decision
                       if choice_orphan_check <= agent.orphan_check: 
@@ -605,7 +609,7 @@ def pro(robot1,robot2):
                                 l = robot1_orphans
                             if (not l)==False:
                                 if ((board.board[i][j] in l) == True):
-                                    agent.motive += 0.35  
+                                    agent.motive += reward 
                       #decide to move or not                                                                                                  
                       #make the decision to move the block
                       if ((choice2+agent.motive)>= .50):
@@ -656,7 +660,7 @@ def pro(robot1,robot2):
                           #smack if the agent tries to take a zero
                           if(board.board[mi][mj] == 0.0):
                             agent.check_zero+= 0.05
-                            agent.motive+= -0.35                            
+                            agent.motive+= penalty                            
                       #check if agent needs the block
                       #choice to check own blocks
                       if (c_choice <= agent.check_my_needed):
@@ -668,7 +672,7 @@ def pro(robot1,robot2):
                               #give a reinforcemnt
                               agent.check_my_needed += 0.05
                               #set the motive much lower to not move the block
-                              agent.motive += 0.35  
+                              agent.motive += reward  
                       #check if they need 
                       if (c_choice2 <= agent.check_their_needed):
                           #give a reinforcemnt
@@ -679,7 +683,7 @@ def pro(robot1,robot2):
                               #give a reinforcemnt
                               agent.check_their_needed += 0.05
                               #set the motive much higher to move the block
-                              agent.motive -= 0.35
+                              agent.motive += penalty
                         
                       #forward thinking decision
                       #forward think decision
@@ -694,7 +698,7 @@ def pro(robot1,robot2):
                                 l = robot2_orphans
                             if (not l)==False:
                                 if ((board.board[mi][mj] in l) == True):
-                                    agent.motive += 0.35
+                                    agent.motive += reward
 
                       #decide to take or not          
                       #make the decision to move the block
@@ -745,14 +749,14 @@ def pro(robot1,robot2):
                           #smack if the agent tries to take a zero
                           if(board.board[i][j2] == 0.0):
                             agent.check_zero+= 0.05
-                            agent.motive+= -0.35                            
+                            agent.motive+= penalty                           
                       
                       #check if the middle is full
                       if (m_choice <= agent.check_middle):
                         agent.check_middle+=0.01
                         if (0.0 in middle) == False:
                             agent.check_middle+=0.05
-                            agent.motive+= -0.35                            
+                            agent.motive+= penalty                            
                       
                       #check if agent needs the block
                       #choice to check own blocks
@@ -765,7 +769,7 @@ def pro(robot1,robot2):
                               #give a reinforcemnt
                               agent.check_my_needed += 0.05
                               #set the motive much lower to not move the block
-                              agent.motive += 0.35 
+                              agent.motive += reward
                     
                       #check if they need 
                       if (c_choice2 <= agent.check_their_needed):
@@ -777,7 +781,7 @@ def pro(robot1,robot2):
                               #give a reinforcemnt
                               agent.check_their_needed += 0.05
                               #set the motive much higher to move the block
-                              agent.motive += -0.35
+                              agent.motive += penalty
                               
                       #forward thinking decision
                       #forward think decision
@@ -794,10 +798,10 @@ def pro(robot1,robot2):
                                 l2 = robot2_orphans
                             if (not l)==False:
                                 if((board.board[i][j2] in l) == True):
-                                    agent.motive += -0.35
+                                    agent.motive += penalty
                             if (not l2)==False:  
                                 if((board.board[i][j2] in l2) == True):
-                                    agent.motive += 0.35                                            
+                                    agent.motive += reward                                            
                       #decide to move or not                                                                            
                       #make the decision to move the block
                       if ((choice2+agent.motive)>= .50):
@@ -898,9 +902,9 @@ def pro(robot1,robot2):
     
 """
 # Reload the file
-robot1 = pickle.load(open("robot1_2000_1m.pickle", "rb"))
+robot1 = pickle.load(open("robot1_50_4m_new4.pickle", "rb"))
 # Reload the file
-robot2 = pickle.load(open("robot2_2000_1m.pickle", "rb"))    
+robot2 = pickle.load(open("robot2_50_4m_new4.pickle", "rb"))    
 """
 
 #need this for multithreading
@@ -914,7 +918,7 @@ if __name__ == '__main__':
    w_turns = []
    show_chat = False
    epochs = 50
-   amount  = 2000000
+   amount  = 10000
    start_time = time.time()
    for i in tqdm(range(amount)):       
        pro(robot1,robot2)
@@ -928,6 +932,7 @@ if __name__ == '__main__':
    x = 'L'
    y = 'W'
    d = Counter(score_log)
+   print('{} epochs, for {} games'.format(epochs, amount))
    print('{} has occurred {} times'.format(x, d[x]))
    print('{} has occurred {} times'.format(y, d[y]))
    print('{} Average turns taken.'.format(round(sum(totalturns)/len(totalturns))))
@@ -936,13 +941,54 @@ if __name__ == '__main__':
    print(robot2.colors_needed)
    
    
+   j = 1
+   w = 0
+   l = 0
+   t_w = []
+   t_l = []
+   tit = 50
+   for i in range(amount):
+       if score_log[i] == 'W':
+           w+=1
+       else:
+           l+=1
+       
+       if j == tit:
+           t_w.append(w)
+           t_l.append(l)
+           w = 0
+           l = 0
+           j=1
+       j+=1
+   
+   # line 1 points
+   x1 = range(len(t_w))
+   y1 = t_w
+   # plotting the line 1 points 
+   plt.plot(x1, y1, label = "Wins")
+   # line 2 points
+   x2 = range(len(t_l))
+   y2 = t_l
+   # plotting the line 2 points 
+   plt.plot(x2, y2, label = "losses")
+   plt.xlabel('x - axis')
+   # Set the y axis label of the current axis.
+   plt.ylabel('y - axis')
+   # Set a title of the current axes.
+   plt.title('Win/loss amount per {} games'.format(tit))
+   # show a legend on the plot
+   plt.legend()
+   # Display a figure.
+   plt.show()
+   
     
    #plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
    plt.hist(totalturns, color = 'green', edgecolor = 'black',bins = int(50))
-   
+   """
    #test 1 is train 1000 then test on 50 or 100
    #test 2 is train 2000
    # Save the file
    pickle.dump(robot1, file = open("robot1_50_2m_new4.pickle", "wb"))
    #save the file
    pickle.dump(robot2, file = open("robot2_50_2m_new4.pickle", "wb"))
+   """
