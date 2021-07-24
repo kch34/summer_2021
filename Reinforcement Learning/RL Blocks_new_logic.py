@@ -34,6 +34,13 @@ score_log = []
 game_log = []
 show_chat = True
 epochs = 0
+parma = [0,0]
+
+
+
+reward = 0
+penalty = 0
+
 #the board class
 class State:
     #initialize the state 
@@ -173,7 +180,7 @@ class Found(Exception): pass
 robot1 = botty('taysir')
 robot2 = botty('zach')
 #the main code to be used for looping
-def pro(robot1,robot2):
+def pro(robot1,robot2,parma):
     #need this for multithreading
     #if __name__ == '__main__':
         #used for multithreading
@@ -327,7 +334,7 @@ def pro(robot1,robot2):
 
 
         #the reinforcement learning heuristic
-        def rl_forward_think(agent,agent2,input_msg,side,show_chat,robot1_orphans,robot2_orphans,orphans_exist):
+        def rl_forward_think(agent,agent2,input_msg,side,show_chat,robot1_orphans,robot2_orphans,orphans_exist,parma):
             #get agent1's features
             agent_owned = agent.colors_owned.copy()
             agent_needed = agent.colors_needed.copy()
@@ -413,7 +420,7 @@ def pro(robot1,robot2):
                     #if a question was asked then we want to increase the chance to happen again
                     agent.check_asked += 0.01
                     #set more motive to give
-                    agent.give_motive += 0.15
+                    agent.give_motive += parma[2]
                     #set the flag that agent was asked to move a block
                     agent.was_asked = True
                 else:
@@ -511,22 +518,22 @@ def pro(robot1,robot2):
 
             #if the agent was asked to move encourge the agent to move as first attempt
             if((agent.checked_for_asked==True)and(agent.was_asked==True)):
-                agent.give_motive       += 0.15
+                agent.give_motive       += parma[3]
             elif((agent_needs_blocks==True)and(agent_can_take_blocks==True)):
-                agent.take_motive       += 0.15
+                agent.take_motive       += parma[4]
             elif((agent_needs_blocks==False)and(agent_can_take_blocks==True)):
-                agent.try_to_ask_motive += 0.15
+                agent.try_to_ask_motive += parma[5]
                 
             #decide to check the middle
             m_choice = random.random()
             if (m_choice <= agent.check_middle):
                 agent.check_middle+=0.01
                 if (0.0 in middle) == False:
-                    agent.take_motive       += 0.35                
+                    agent.take_motive       += parma[6]                
                                                 
                     
-            reward = 0.35
-            penalty= -0.35
+            reward = parma[0]
+            penalty= parma[1]
                     
             #the decision loop
             while True:                            
@@ -846,12 +853,12 @@ def pro(robot1,robot2):
             if A==True:
                 if show_chat == True:
                     print(robot1.name)
-                txt = rl_forward_think(robot1,robot2,game_log[-1],"left",show_chat,robot1_orphans,robot2_orphans,orphans_exist)
+                txt = rl_forward_think(robot1,robot2,game_log[-1],"left",show_chat,robot1_orphans,robot2_orphans,orphans_exist,parma)
                 A = False
             else:
                 if show_chat == True:
                     print(robot2.name)
-                txt = rl_forward_think(robot2,robot1,game_log[-1],"right",show_chat,robot1_orphans,robot2_orphans,orphans_exist)            
+                txt = rl_forward_think(robot2,robot1,game_log[-1],"right",show_chat,robot1_orphans,robot2_orphans,orphans_exist,parma)            
                 A = True
             if show_chat == True:
                 print(txt)                
@@ -908,87 +915,106 @@ robot2 = pickle.load(open("robot2_50_4m_new4.pickle", "rb"))
 """
 
 #need this for multithreading
-if __name__ == '__main__':    
-   #used for multithreading
-   freeze_support()   
-   totalblocks = []
-   totalturns = []
-   score_log = []
-   game_log = []
-   w_turns = []
-   show_chat = False
-   epochs = 50
-   amount  = 10000
-   start_time = time.time()
-   for i in tqdm(range(amount)):       
-       pro(robot1,robot2)
+if __name__ == '__main__':           
+   r = 0.001 
+   p = -0.001
+   start_time2 = time.time()
+   for i2 in range(350):
+       print('round {},'.format(i2))
+       import matplotlib.pyplot as plt
+       r+=0.001
+       p+=-0.001
+       robot1 = botty('taysir')
+       robot2 = botty('zach')
+       #used for multithreading
+       freeze_support()   
+       totalblocks = []
+       totalturns = []
+       score_log = []
+       game_log = []
+       w_turns = []
+       parma = [0.35,-0.35,r,0.15,0.15,0.15,0.20]
+       show_chat = False
+       epochs = 50
+       amount  = 10000
+       start_time = time.time()
+       for i in tqdm(range(amount)):       
+           pro(robot1,robot2,parma)
+       print(" ")
+       x = round(time.time() - start_time,3)
+       y = round(x/60,3)
+       print("--- %s seconds ---" % (x))
+       print("--- %s minutes ---" % (y))
+       
+        # driver program
+       x = 'L'
+       y = 'W'
+       d = Counter(score_log)
+       print('{} epochs, for {} games'.format(epochs, amount))
+       print('{} has occurred {} times'.format(x, d[x]))
+       print('{} has occurred {} times'.format(y, d[y]))
+       print('{} Average turns taken.'.format(round(sum(totalturns)/len(totalturns))))
+       print('{} Average Goal Completion turns taken.'.format(round(sum(w_turns)/len(w_turns))))
+       print(robot1.colors_needed)
+       print(robot2.colors_needed)
+       
+       
+       j = 1
+       w = 0
+       l = 0
+       t_w = []
+       t_l = []
+       tit = 50
+       for i in range(amount):
+           if score_log[i] == 'W':
+               w+=1
+           else:
+               l+=1
+           
+           if j == tit:
+               t_w.append(w)
+               t_l.append(l)
+               w = 0
+               l = 0
+               j=1
+           j+=1
+       
+       # line 1 points
+       x1 = range(len(t_w))
+       y1 = t_w
+       # plotting the line 1 points 
+       plt.plot(x1, y1, label = "Wins")
+       # line 2 points
+       x2 = range(len(t_l))
+       y2 = t_l
+       # plotting the line 2 points 
+       plt.plot(x2, y2, label = "losses")
+       plt.xlabel('x - axis')
+       # Set the y axis label of the current axis.
+       plt.ylabel('y - axis')
+       # Set a title of the current axes.
+       plt.title('Win/loss per {} games, {} [2]'.format(tit,r))
+       # show a legend on the plot
+       plt.legend()
+       # Display a figure.
+       plt.show()
+       plt.clf()
+       plt.cla()
+       
+        
+       #plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
+       #plt.hist(totalturns, color = 'green', edgecolor = 'black',bins = int(50))
+       """
+       #test 1 is train 1000 then test on 50 or 100
+       #test 2 is train 2000
+       # Save the file
+       pickle.dump(robot1, file = open("robot1_50_2m_new4.pickle", "wb"))
+       #save the file
+       pickle.dump(robot2, file = open("robot2_50_2m_new4.pickle", "wb"))
+       """
+      
    print(" ")
-   x = round(time.time() - start_time,3)
+   x = round(time.time() - start_time2,3)
    y = round(x/60,3)
    print("--- %s seconds ---" % (x))
    print("--- %s minutes ---" % (y))
-   
-    # driver program
-   x = 'L'
-   y = 'W'
-   d = Counter(score_log)
-   print('{} epochs, for {} games'.format(epochs, amount))
-   print('{} has occurred {} times'.format(x, d[x]))
-   print('{} has occurred {} times'.format(y, d[y]))
-   print('{} Average turns taken.'.format(round(sum(totalturns)/len(totalturns))))
-   print('{} Average Goal Completion turns taken.'.format(round(sum(w_turns)/len(w_turns))))
-   print(robot1.colors_needed)
-   print(robot2.colors_needed)
-   
-   
-   j = 1
-   w = 0
-   l = 0
-   t_w = []
-   t_l = []
-   tit = 50
-   for i in range(amount):
-       if score_log[i] == 'W':
-           w+=1
-       else:
-           l+=1
-       
-       if j == tit:
-           t_w.append(w)
-           t_l.append(l)
-           w = 0
-           l = 0
-           j=1
-       j+=1
-   
-   # line 1 points
-   x1 = range(len(t_w))
-   y1 = t_w
-   # plotting the line 1 points 
-   plt.plot(x1, y1, label = "Wins")
-   # line 2 points
-   x2 = range(len(t_l))
-   y2 = t_l
-   # plotting the line 2 points 
-   plt.plot(x2, y2, label = "losses")
-   plt.xlabel('x - axis')
-   # Set the y axis label of the current axis.
-   plt.ylabel('y - axis')
-   # Set a title of the current axes.
-   plt.title('Win/loss amount per {} games'.format(tit))
-   # show a legend on the plot
-   plt.legend()
-   # Display a figure.
-   plt.show()
-   
-    
-   #plt.hist(totalblocks, color = 'blue', edgecolor = 'black',bins = int(5))
-   plt.hist(totalturns, color = 'green', edgecolor = 'black',bins = int(50))
-   """
-   #test 1 is train 1000 then test on 50 or 100
-   #test 2 is train 2000
-   # Save the file
-   pickle.dump(robot1, file = open("robot1_50_2m_new4.pickle", "wb"))
-   #save the file
-   pickle.dump(robot2, file = open("robot2_50_2m_new4.pickle", "wb"))
-   """
