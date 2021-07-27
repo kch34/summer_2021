@@ -663,12 +663,9 @@ def pro(robot1,robot2):
         print(txt)
         print("  ")
         game_log.append(txt)
-        A = True
-        
-        middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
-        
-        while num_turns > 0 :
-    
+        A = True        
+        middle = [board.board[0][1],board.board[1][1],board.board[2][1]]        
+        while num_turns > 0 :    
             if A==True:
                 print(robot1.name)
                 txt = rl_random(robot1,robot2,game_log[-1],"left")
@@ -682,8 +679,7 @@ def pro(robot1,robot2):
             #do the stuff
             num_turns-=1
             middle = [board.board[0][1],board.board[1][1],board.board[2][1]]
-            #board.print_current()
-            
+            #board.print_current()            
             #sainity check for winning
             if(robot1.done == True and robot2.done == True):                              
                 #first check if the middle is empty
@@ -703,8 +699,7 @@ def pro(robot1,robot2):
                         score_log.append(score)
                         w_turns.append(temp2)
                         return 
-            print(" ")
-        
+            print(" ")        
         print(" ")
         print("Game Time Out")
         print("Turns taken, " + str(turn_max-num_turns))
@@ -736,8 +731,8 @@ if __name__ == '__main__':
    score_log = []
    game_log = []
    w_turns = []
-   epochs = 90
-   amount = 500000
+   epochs = 50
+   amount = 10
    for i in tqdm(range(amount)):
        pro(robot1,robot2)
    # driver program
