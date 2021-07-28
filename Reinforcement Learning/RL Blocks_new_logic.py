@@ -35,12 +35,8 @@ game_log = []
 show_chat = True
 epochs = 0
 parma = [0,0]
-
-
-
 reward = 0
 penalty = 0
-
 #the board class
 class State:
     #initialize the state 
@@ -329,10 +325,6 @@ def pro(robot1,robot2,parma):
         else:
             orphans_exist = False
 
-
-
-
-
         #the reinforcement learning heuristic
         def rl_forward_think(agent,agent2,input_msg,side,show_chat,robot1_orphans,robot2_orphans,orphans_exist,parma):
             #get agent1's features
@@ -381,7 +373,6 @@ def pro(robot1,robot2,parma):
             #set the done state if the agent has needed blocks.
             if agent_needs_blocks == False:
                 agent.set_done(True)                          
-
             #Find out which agent we have
             if side == "left":
                 agent1_side = 0
@@ -389,14 +380,8 @@ def pro(robot1,robot2,parma):
             else:
                 agent1_side = 2
                 agent2_side = 0
-
-
-
             binary_decision = 0.50
             color_asked = " "
-        
-            #logic for finding out if the agent was asked a question
-            
             #find out if the agent was asked to moved a block                      
             #grab the last msg
             msg_list = input_msg.split()
