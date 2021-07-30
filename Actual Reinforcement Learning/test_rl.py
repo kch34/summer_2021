@@ -283,7 +283,7 @@ if __name__ == "__main__":
 
     st = State(p1, p2)
     print("training...")
-    st.play(50000)
+    st.play(5000)
 
     # play with human
     p1 = Player("computer", exp_rate=0)

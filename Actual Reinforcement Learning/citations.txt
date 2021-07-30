@@ -3,3 +3,5 @@ https://towardsdatascience.com/reinforcement-learning-implement-tictactoe-189582
 http://incompleteideas.net/book/the-book-2nd.html
 
 https://github.com/JaeDukSeo/reinforcement-learning-an-introduction
+
+https://wiki.pathmind.com/deep-reinforcement-learning
