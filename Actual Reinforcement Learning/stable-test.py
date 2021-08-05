@@ -6,22 +6,22 @@ Created on Sun Aug  1 07:19:14 2021
 """
 import gym
 
-from stable_baselines3 import DQN
+from stable_baselines3 import A2C
+from stable_baselines3.common.env_util import make_vec_env
 
-env = gym.make("CartPole-v0")
+# Parallel environments
+env = make_vec_env("CartPole-v1", n_envs=4)
 
-model = DQN("MlpPolicy", env, verbose=1)
-model.learn(total_timesteps=10000, log_interval=4)
-model.save("dqn_cartpole")
+model = A2C("MlpPolicy", env, verbose=1)
+model.learn(total_timesteps=25000)
+model.save("a2c_cartpole")
 
 del model # remove to demonstrate saving and loading
 
-model = DQN.load("dqn_cartpole")
+model = A2C.load("a2c_cartpole")
 
 obs = env.reset()
 while True:
-    action, _states = model.predict(obs, deterministic=True)
-    obs, reward, done, info = env.step(action)
+    action, _states = model.predict(obs)
+    obs, rewards, dones, info = env.step(action)
     env.render()
-    if done:
-      obs = env.reset()

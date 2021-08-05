@@ -5,12 +5,9 @@ Created on Mon Aug  2 20:10:58 2021
 @author: Hostl
 """
 from typing import Dict, Union
-
 import gym
 import numpy as np
-
 from stable_baselines3.common.type_aliases import GymStepReturn
-
 
 class SimpleMultiObsEnv(gym.Env):
     """
