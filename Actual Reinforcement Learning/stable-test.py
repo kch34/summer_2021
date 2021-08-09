@@ -73,4 +73,4 @@ for step in range(n_steps):
     print("Goal reached!", "reward=", reward)
     break
 
-https://www.reddit.com/r/reinforcementlearning/comments/mcmrna/how_can_i_use_stablebaselines_to_train_multiple/
+#https://www.reddit.com/r/reinforcementlearning/comments/mcmrna/how_can_i_use_stablebaselines_to_train_multiple/
