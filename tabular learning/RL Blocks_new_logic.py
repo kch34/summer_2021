@@ -27,6 +27,7 @@ BOARD_COLS = 3
 colors = {1:"black",2:"blue",3:"white",4:"red",5:"yellow",6:"pink"}
 key_list = list(colors.keys())
 val_list = list(colors.values())
+
 totalblocks = []
 totalturns = []
 w_turns    = []
