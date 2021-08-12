@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Aug 10 12:12:45 2021
-
-@author: Hostl
+@author: Kevin Charles Hostler
+"""
 """
 import numpy as np
 import gym
 from gym import spaces
+"""
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3 import A2C
 from stable_baselines3.common.env_util import make_vec_env
-#import mgym
 
 from custom_env import block_world
 from custom_goleft import GoLeftEnv
 
 # Instantiate the env
-env = GoLeftEnv(grid_size=10)
-
-
+env = block_world(3,3)
+#env = GoLeftEnv(grid_size=10)
 
 # wrap it
 env = make_vec_env(lambda: env, n_envs=1)
@@ -26,11 +25,23 @@ env = make_vec_env(lambda: env, n_envs=1)
 # Train the agent
 # robot_1 = A2C('MlpPolicy', env, verbose=1).learn(5000)
 
-robot_1 = A2C('MlpPolicy', env, verbose=1,device='cuda').learn(2000)
+steps = 500000
+n     = 50
+
+robot_1 = A2C('MlpPolicy', env, n_steps=n, verbose=1).learn(steps)
+
+
+robot_1.save("a2c_blocks{}_{}".format(steps,n))
+
+del robot_1 # remove to demonstrate saving and loading
+
+robot_1 = A2C.load("a2c_blocks{}_{}".format(steps,n))
+
+
 
 # Test the trained agent
 obs = env.reset()
-n_steps = 20
+n_steps = 50
 for step in range(n_steps):
   action, _ = robot_1.predict(obs, deterministic=True)
   print("Step {}".format(step + 1))
