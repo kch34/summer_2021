@@ -460,6 +460,7 @@ class block_world(MEnv):
     return np.array([self.board]).astype(np.float32)
 
   def step(self, action):
+    reward = 0
       
     if (action in self.legal_moves):               
          decision = self.moves[action]           
@@ -468,13 +469,28 @@ class block_world(MEnv):
          l_i = decision[1][0]
          l_j = decision[1][1]
     else:
-        raise ValueError("Received invalid action={} which is not part of the action space".format(action))
-          
+        raise ValueError("Received invalid action={} which is not part of the action space".format(action))        
      #move the block
     if self.board[l_i][l_j]==0.0 and self.board[b_i][b_j]!=0.0:
+
+         #check for rewards         
+         #moving a 1 or 3
+         if ((self.board[b_i][b_j] == 1.0) or (self.board[b_i][b_j] == 3.0)):         
+             if  ((b_j==2 and l_j==1) or (b_j==1 and l_j==0)):
+                 reward +=  1
+             elif((b_j==0 and l_j==1) or (b_j==1 and l_j==2)):
+                 reward += -1
+         #moving a 2 or 4
+         if ((self.board[b_i][b_j] == 2.0) or (self.board[b_i][b_j] == 4.0)):         
+             if  ((b_j==0 and l_j==1) or (b_j==1 and l_j==2)):
+                 reward +=  1
+             elif((b_j==2 and l_j==1) or (b_j==1 and l_j==0)):
+                 reward += -1         
          temp                 = self.board[b_i][b_j]
          self.board[b_i][b_j] = 0.0
          self.board[l_i][l_j] = temp
+    else:
+        reward+= -1
          
     temp = (self.board == self.goal_board)
     
@@ -484,7 +500,7 @@ class block_world(MEnv):
         done = True
     
     # Null reward everywhere except when reaching the goal (left of the grid)
-    reward = 1 if done == True else 0
+    reward += 20 if done == True else 0
 
     # Optionally we can pass additional info, we are not using that for now
     info = {}

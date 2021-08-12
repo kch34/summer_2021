@@ -1,0 +1,2 @@
+model_checkpoint_path: "cem_go_left_params.h5f"
+all_model_checkpoint_paths: "cem_go_left_params.h5f"
